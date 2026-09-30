@@ -82,9 +82,17 @@ const galleryItems =
         alt: item.image.alt,
         styleCategory: item.styleCategory,
         context: item.caption,
+        venue: item.venue,
         location: item.location,
+        photographerName: item.photographerName,
+        photographerUrl: item.photographerUrl,
       }))
-    : fallbackGalleryItems;
+    : fallbackGalleryItems.map((item) => ({
+        ...item,
+        venue: undefined,
+        photographerName: undefined,
+        photographerUrl: undefined,
+      }));
 ---
 
 <BaseLayout title={title} description={description} headerTheme="light" schema={schemas}>
@@ -115,7 +123,23 @@ const galleryItems =
         </div>
         <figcaption>
           <span>{item.styleCategory}</span>
-          {(item.context || item.location) && <span>{item.context || item.location}</span>}
+          <span class="image-details">
+            {(item.context || item.venue || item.location) && (
+              <span>{item.context || item.venue || item.location}</span>
+            )}
+            {item.photographerName && (
+              <span>
+                Photo:{' '}
+                {item.photographerUrl ? (
+                  <a href={item.photographerUrl} target="_blank" rel="noreferrer">
+                    {item.photographerName}
+                  </a>
+                ) : (
+                  item.photographerName
+                )}
+              </span>
+            )}
+          </span>
         </figcaption>
       </figure>
     ))}
@@ -214,10 +238,16 @@ const galleryItems =
     font-size: var(--step--1);
   }
 
-  figcaption span:first-child {
+  figcaption > span:first-child {
     color: var(--color-text);
     font-weight: 600;
     text-transform: uppercase;
+  }
+
+  .image-details {
+    display: grid;
+    gap: var(--space-1);
+    text-align: right;
   }
 
   .portfolio-note {

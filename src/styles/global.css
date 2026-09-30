@@ -13,7 +13,12 @@
 html {
   min-width: 20rem;
   scroll-behavior: smooth;
+  scroll-padding-top: 6.75rem;
   scrollbar-gutter: stable;
+}
+
+:where(main, [id]) {
+  scroll-margin-top: 6.75rem;
 }
 
 body {
@@ -147,5 +152,15 @@ p {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+@media (min-width: 62rem) {
+  html {
+    scroll-padding-top: 7.75rem;
+  }
+
+  :where(main, [id]) {
+    scroll-margin-top: 7.75rem;
   }
 }

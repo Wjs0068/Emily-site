@@ -1,3 +1,5 @@
+import type { SiteSettingsResult } from '@/lib/sanity/types';
+
 // Development-only fallback content. Production access is gated in src/lib/sanity/content.ts.
 // These values must never be treated as owner-approved merely because they render locally.
 export const navigation = [
@@ -90,16 +92,76 @@ export const processSteps = [
   },
 ] as const;
 
+// Every time-sensitive or biographical value below is intentionally unresolved in development.
+// Production requires the matching nested content status to be OWNER_APPROVED.
+export const developmentSiteSettings = {
+  contentStatus: 'UNRESOLVED',
+  businessName: "Em's Bridal Hair",
+  shortName: "Em's",
+  tagline: 'Romantic, effortless styling for calm wedding mornings across Colorado.',
+  serviceAreas: [
+    { placeName: 'Denver', placeType: 'city' },
+    { placeName: 'Colorado', placeType: 'state' },
+  ],
+  socialLinks: [],
+  bookingAvailability: {
+    contentStatus: 'UNRESOLVED',
+    eyebrow: 'Current availability',
+    status: 'limited',
+    headline: 'Now booking 2027',
+    detail: 'A limited number of Colorado wedding dates remain.',
+    years: [2027],
+    lastReviewedAt: '2026-09-29',
+  },
+  experienceStats: [
+    {
+      contentStatus: 'UNRESOLVED',
+      value: '300+',
+      label: 'Weddings styled',
+      lastReviewedAt: '2026-09-29',
+    },
+    {
+      contentStatus: 'UNRESOLVED',
+      value: '9',
+      label: 'Years of experience',
+      lastReviewedAt: '2026-09-29',
+    },
+    {
+      contentStatus: 'UNRESOLVED',
+      value: '3',
+      label: 'Years as a bridal educator',
+      lastReviewedAt: '2026-09-29',
+    },
+  ],
+  brandRecognition: {
+    contentStatus: 'UNRESOLVED',
+    text: 'Her early work began catching the attention of hair brands online.',
+  },
+  previewLocation: {
+    contentStatus: 'UNRESOLVED',
+    name: 'Studio 33',
+    locality: 'Littleton',
+    region: 'Colorado',
+  },
+} satisfies SiteSettingsResult;
+
 export const testimonials = [
   {
     quote:
-      "I seriously trust Emily with my life! I've never seen someone do such magic work on my hair. She is so gifted and definitely in the right industry!",
+      "I seriously trust Emily with my life! I've never seen someone do such magic work on my hair—she is so gifted and definitely in the right industry! My mom also loved her; we couldn't stop smiling ever after the bridal preview!",
     clientName: 'Kailey',
+    featured: true,
+  },
+  {
+    quote: 'Understood what a Texan bride wants for her hair.',
+    clientName: 'Lauren',
+    featured: true,
   },
   {
     quote:
       "I can't even put into words how confident Emily made me feel on my wedding day. Emily is so talented.",
     clientName: 'Caley',
+    featured: true,
   },
 ] as const;
 
@@ -123,8 +185,36 @@ export type FaqCategory = {
     question: string;
     answer: string;
     needsOwnerConfirmation?: true;
+    ownerDecisionKey?: string;
   }>;
 };
+
+export const requiredFaqDecisionKeys = [
+  'bookingWindow',
+  'retainerAmount',
+  'retainerRefundable',
+  'retainerAppliedToBalance',
+  'contractChanges',
+  'minimumInvestment',
+  'serviceCountLimits',
+  'secondArtistInclusion',
+  'assistantFeeConditions',
+  'assistantFeeAmount',
+  'additionalGuestPolicy',
+  'travelFormula',
+  'tolls',
+  'parking',
+  'lodging',
+  'previewTerminology',
+  'previewIncluded',
+  'previewRequired',
+  'previewLength',
+  'previewLooks',
+  'previewLocation',
+  'guestPreview',
+  'flowerGirlAge',
+  'availability2027',
+] as const;
 
 // Migrated from the audited Wix inventory. Flagged answers intentionally avoid disputed specifics.
 export const faqCategories: FaqCategory[] = [
@@ -137,24 +227,48 @@ export const faqCategories: FaqCategory[] = [
         answer:
           'Reach out once your date and getting-ready location are known. Popular Saturdays tend to fill first, but availability is reviewed personally for every inquiry.',
         needsOwnerConfirmation: true,
+        ownerDecisionKey: 'bookingWindow',
       },
       {
-        question: 'How do I secure my date?',
+        question: 'Is the current retainer $250?',
         answer:
-          'Begin with an inquiry. If your date is available, your proposal will identify the agreement and retainer required to reserve it.',
+          'Your proposal will state the current retainer amount and what is required to reserve the date.',
         needsOwnerConfirmation: true,
+        ownerDecisionKey: 'retainerAmount',
+      },
+      {
+        question: 'Is the retainer refundable?',
+        answer: 'The refund terms in your current proposal and signed agreement will apply.',
+        needsOwnerConfirmation: true,
+        ownerDecisionKey: 'retainerRefundable',
+      },
+      {
+        question: 'Is the retainer applied to the balance?',
+        answer:
+          'Your proposal will show how the retainer is handled and how it affects the remaining balance.',
+        needsOwnerConfirmation: true,
+        ownerDecisionKey: 'retainerAppliedToBalance',
       },
       {
         question: 'Can I change my contract?',
         answer:
           'Ask as soon as your party changes. Additions depend on timing and artist availability, while the terms in your signed agreement govern removals and deadlines.',
         needsOwnerConfirmation: true,
+        ownerDecisionKey: 'contractChanges',
       },
       {
         question: 'Do you have a booking minimum?',
         answer:
           'The current bridal collections begin with The Intimate. Your location, service count, timing, and staffing needs are reviewed before the applicable investment is confirmed in your proposal.',
         needsOwnerConfirmation: true,
+        ownerDecisionKey: 'minimumInvestment',
+      },
+      {
+        question: 'Is 2027 availability current?',
+        answer:
+          'Availability changes as dates are reserved. The inquiry process is the source of truth for a specific date.',
+        needsOwnerConfirmation: true,
+        ownerDecisionKey: 'availability2027',
       },
     ],
   },
@@ -168,22 +282,46 @@ export const faqCategories: FaqCategory[] = [
           'Yes. Clip-in extension rental is currently offered as an add-on and can support extra length, fullness, and lasting shape. Emily will help determine whether it suits your chosen style.',
       },
       {
-        question: 'When does an assistant fee apply?',
+        question: 'Are there limits on the number of hair services?',
+        answer:
+          'The workable service count depends on the collection, available styling window, and artist coverage. Emily will confirm the plan before booking.',
+        needsOwnerConfirmation: true,
+        ownerDecisionKey: 'serviceCountLimits',
+      },
+      {
+        question: 'When is a second artist included?',
+        answer:
+          'Artist coverage is matched to the collection, service count, and available wedding-morning timeline and will be listed in the proposal.',
+        needsOwnerConfirmation: true,
+        ownerDecisionKey: 'secondArtistInclusion',
+      },
+      {
+        question: 'When does an additional assistant fee apply?',
         answer:
           'Artist coverage is based on your party size and wedding-morning timeline. Any additional staffing and its cost will be identified clearly in your proposal before you reserve.',
         needsOwnerConfirmation: true,
+        ownerDecisionKey: 'assistantFeeConditions',
       },
       {
-        question: 'Do you have a minimum service requirement?',
+        question: 'Is the assistant fee still $250?',
         answer:
-          'The Intimate is the smallest collection currently published. Emily will confirm the right collection after reviewing your date, location, and requested services.',
+          'Any assistant fee will be stated in your proposal; no unconfirmed amount is published here.',
         needsOwnerConfirmation: true,
+        ownerDecisionKey: 'assistantFeeAmount',
+      },
+      {
+        question: 'Can additional guests always be added?',
+        answer:
+          'Additions depend on the contracted collection, timing, and available artist coverage. Ask as soon as your party changes.',
+        needsOwnerConfirmation: true,
+        ownerDecisionKey: 'additionalGuestPolicy',
       },
       {
         question: 'What age is considered a flower girl service?',
         answer:
           'Age definitions, style scope, timing, and pricing for flower girls are confirmed in your proposal so the service fits the child and the wedding-day schedule.',
         needsOwnerConfirmation: true,
+        ownerDecisionKey: 'flowerGirlAge',
       },
     ],
   },
@@ -192,38 +330,59 @@ export const faqCategories: FaqCategory[] = [
     introduction: 'A focused appointment for shaping and refining your direction.',
     items: [
       {
+        question: 'Are a bridal preview and bridal trial the same service?',
+        answer:
+          'This site uses “bridal preview.” Your proposal will use the final owner-approved term consistently.',
+        needsOwnerConfirmation: true,
+        ownerDecisionKey: 'previewTerminology',
+      },
+      {
         question: 'Can I schedule a preview before booking?',
         answer:
           'Bridal previews are part of the booked experience and are scheduled after your wedding date has been reserved.',
         needsOwnerConfirmation: true,
       },
       {
+        question: 'Is the bridal preview approximately two hours?',
+        answer:
+          'The appointment length will be confirmed when the preview is scheduled so there is enough time for thoughtful styling decisions.',
+        needsOwnerConfirmation: true,
+        ownerDecisionKey: 'previewLength',
+      },
+      {
         question: 'How many looks can I see during my preview?',
         answer:
           'The appointment is designed to refine one cohesive direction. The number of variations possible depends on the styles, your hair, and the time needed to shape each detail.',
         needsOwnerConfirmation: true,
+        ownerDecisionKey: 'previewLooks',
       },
       {
         question: 'Is the bridal preview included?',
-        answer: 'Yes. A bridal preview is included in each currently published bridal collection.',
+        answer:
+          'Your proposal will state whether the bridal preview is included in your collection.',
+        needsOwnerConfirmation: true,
+        ownerDecisionKey: 'previewIncluded',
       },
       {
         question: 'Is a bridal preview required?',
         answer:
           'A preview is strongly recommended because it creates time to test proportion, texture, and finishing details before the wedding morning. Ask Emily about your circumstances when you inquire.',
         needsOwnerConfirmation: true,
+        ownerDecisionKey: 'previewRequired',
       },
       {
-        question: 'Where does my bridal preview take place?',
+        question: 'Do previews still take place at Studio 33 in Littleton?',
         answer:
           'The current appointment location and arrival details are shared directly with booked clients.',
         needsOwnerConfirmation: true,
+        ownerDecisionKey: 'previewLocation',
       },
       {
         question: 'Can my mom or bridesmaid schedule a preview?',
         answer:
           'Additional previews may be possible for contracted party members when the schedule allows. Availability and pricing are confirmed directly.',
         needsOwnerConfirmation: true,
+        ownerDecisionKey: 'guestPreview',
       },
     ],
   },
@@ -232,10 +391,31 @@ export const faqCategories: FaqCategory[] = [
     introduction: 'On-location service for Denver and celebrations across Colorado.',
     items: [
       {
-        question: 'Do you have a travel fee?',
+        question: 'Is travel still $30 per 30 minutes round trip?',
         answer:
-          'Travel is quoted after your getting-ready location is confirmed. Your proposal will make any travel, parking, lodging, or timing considerations clear.',
+          'Travel is quoted after the getting-ready location is confirmed. The current calculation and any rounding will be stated in your proposal.',
         needsOwnerConfirmation: true,
+        ownerDecisionKey: 'travelFormula',
+      },
+      {
+        question: 'How are tolls handled?',
+        answer: 'Any toll responsibility will be identified in the proposal before booking.',
+        needsOwnerConfirmation: true,
+        ownerDecisionKey: 'tolls',
+      },
+      {
+        question: 'How is parking handled?',
+        answer:
+          'Share the getting-ready location and known parking details so any parking responsibility can be confirmed in advance.',
+        needsOwnerConfirmation: true,
+        ownerDecisionKey: 'parking',
+      },
+      {
+        question: 'When is lodging required?',
+        answer:
+          'Lodging needs depend on location and timing. Any requirement will be discussed and included in the proposal.',
+        needsOwnerConfirmation: true,
+        ownerDecisionKey: 'lodging',
       },
     ],
   },

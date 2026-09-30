@@ -98,6 +98,29 @@ export default defineType({
       type: 'object',
       fields: [
         defineField({
+          name: 'contentStatus',
+          title: 'Availability status',
+          type: 'string',
+          description: 'Availability must be confirmed separately because it changes over time.',
+          options: {
+            layout: 'radio',
+            list: [
+              { title: 'Owner approved', value: 'OWNER_APPROVED' },
+              { title: 'Development sample', value: 'DEVELOPMENT_SAMPLE' },
+              { title: 'Unresolved', value: 'UNRESOLVED' },
+            ],
+          },
+          initialValue: 'UNRESOLVED',
+          validation: (Rule) => Rule.required(),
+        }),
+        defineField({
+          name: 'eyebrow',
+          title: 'Eyebrow',
+          type: 'string',
+          initialValue: 'Current availability',
+          validation: (Rule) => Rule.required().max(50),
+        }),
+        defineField({
           name: 'status',
           title: 'Status',
           type: 'string',
@@ -119,7 +142,7 @@ export default defineType({
         }),
         defineField({ name: 'detail', title: 'Detail', type: 'text', rows: 3 }),
         defineField({
-          name: 'bookingYears',
+          name: 'years',
           title: 'Booking years',
           type: 'array',
           of: [defineArrayMember({ type: 'number' })],
@@ -158,6 +181,21 @@ export default defineType({
           type: 'object',
           fields: [
             defineField({
+              name: 'contentStatus',
+              title: 'Statistic status',
+              type: 'string',
+              options: {
+                layout: 'radio',
+                list: [
+                  { title: 'Owner approved', value: 'OWNER_APPROVED' },
+                  { title: 'Development sample', value: 'DEVELOPMENT_SAMPLE' },
+                  { title: 'Unresolved', value: 'UNRESOLVED' },
+                ],
+              },
+              initialValue: 'UNRESOLVED',
+              validation: (Rule) => Rule.required(),
+            }),
+            defineField({
               name: 'value',
               title: 'Value',
               type: 'string',
@@ -173,6 +211,56 @@ export default defineType({
           ],
           preview: { select: { title: 'value', subtitle: 'label' } },
         }),
+      ],
+    }),
+    defineField({
+      name: 'brandRecognition',
+      title: 'Brand recognition',
+      description: 'Optional. Do not name brands until Emily confirms the claim and wording.',
+      type: 'object',
+      fields: [
+        defineField({
+          name: 'contentStatus',
+          title: 'Content status',
+          type: 'string',
+          options: {
+            layout: 'radio',
+            list: [
+              { title: 'Owner approved', value: 'OWNER_APPROVED' },
+              { title: 'Development sample', value: 'DEVELOPMENT_SAMPLE' },
+              { title: 'Unresolved', value: 'UNRESOLVED' },
+            ],
+          },
+          initialValue: 'UNRESOLVED',
+          validation: (Rule) => Rule.required(),
+        }),
+        defineField({ name: 'text', title: 'Wording', type: 'text', rows: 3 }),
+      ],
+    }),
+    defineField({
+      name: 'previewLocation',
+      title: 'Public preview location',
+      description: 'City-level public location only. Never enter a private home address.',
+      type: 'object',
+      fields: [
+        defineField({
+          name: 'contentStatus',
+          title: 'Content status',
+          type: 'string',
+          options: {
+            layout: 'radio',
+            list: [
+              { title: 'Owner approved', value: 'OWNER_APPROVED' },
+              { title: 'Development sample', value: 'DEVELOPMENT_SAMPLE' },
+              { title: 'Unresolved', value: 'UNRESOLVED' },
+            ],
+          },
+          initialValue: 'UNRESOLVED',
+          validation: (Rule) => Rule.required(),
+        }),
+        defineField({ name: 'name', title: 'Location name', type: 'string' }),
+        defineField({ name: 'locality', title: 'City', type: 'string' }),
+        defineField({ name: 'region', title: 'State', type: 'string' }),
       ],
     }),
     defineField({

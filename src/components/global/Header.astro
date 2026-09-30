@@ -16,7 +16,7 @@ const visibleNavigation = navigation.filter(
 );
 ---
 
-<header class:list={['site-header', { 'site-header--light': theme === 'light' }]} data-header>
+<header class:list={['site-header', `site-header--${theme}`]} data-header data-theme={theme}>
   <a class="brand" href="/" aria-label="Em's Bridal Hair, home">
     <span>Em's</span>
     <small>Bridal Hair</small>
@@ -64,6 +64,13 @@ const visibleNavigation = navigation.filter(
     if (restoreFocus) toggle.focus();
   };
 
+  const updateStickyState = () => {
+    header?.toggleAttribute('data-scrolled', window.scrollY > 16);
+  };
+
+  updateStickyState();
+  window.addEventListener('scroll', updateStickyState, { passive: true });
+
   toggle?.addEventListener('click', () => {
     if (!toggle || !navigation) return;
     const isOpen = toggle.getAttribute('aria-expanded') === 'true';
@@ -83,6 +90,23 @@ const visibleNavigation = navigation.filter(
     if (event.key === 'Escape' && toggle?.getAttribute('aria-expanded') === 'true') {
       closeMenu(true);
     }
+
+    if (event.key === 'Tab' && toggle?.getAttribute('aria-expanded') === 'true' && navigation) {
+      const focusable = [toggle, ...navigation.querySelectorAll<HTMLElement>('a[href]')];
+      const first = focusable[0];
+      const last = focusable.at(-1);
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last?.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first?.focus();
+      }
+    }
+  });
+
+  navigation?.querySelectorAll('a').forEach((link) => {
+    link.addEventListener('click', () => closeMenu());
   });
 
   window.matchMedia('(min-width: 62rem)').addEventListener('change', (event) => {
@@ -92,20 +116,35 @@ const visibleNavigation = navigation.filter(
 
 <style>
   .site-header {
-    position: absolute;
-    inset: 0 0 auto;
-    z-index: 20;
+    --safe-area-top: env(safe-area-inset-top, 0px);
+    --header-height: calc(6rem + var(--safe-area-top));
+    position: sticky;
+    top: 0;
+    z-index: 50;
     display: flex;
-    min-height: 6rem;
+    min-height: var(--header-height);
     align-items: center;
     justify-content: space-between;
-    padding: var(--space-3) var(--gutter);
-    color: var(--color-surface);
+    padding: max(var(--space-3), var(--safe-area-top)) var(--gutter) var(--space-3);
+    border-bottom: 1px solid color-mix(in srgb, var(--color-border) 38%, transparent);
+    background: color-mix(in srgb, var(--color-background) 92%, transparent);
+    color: var(--color-text);
+    backdrop-filter: blur(12px);
+    transition:
+      background-color var(--duration-fast) var(--ease-out),
+      border-color var(--duration-fast) var(--ease-out),
+      color var(--duration-fast) var(--ease-out);
   }
 
-  .site-header--light {
-    position: relative;
-    color: var(--color-text);
+  .site-header--overlay {
+    margin-bottom: calc(-1 * var(--header-height));
+  }
+
+  .site-header--overlay:not([data-scrolled]) {
+    border-bottom-color: transparent;
+    background: transparent;
+    color: var(--color-surface);
+    backdrop-filter: none;
   }
 
   .brand {
@@ -113,8 +152,11 @@ const visibleNavigation = navigation.filter(
     flex-direction: column;
     font-size: clamp(1.5rem, 2.2vw, 2.125rem);
     line-height: 1;
-    text-shadow: 0 1px 12px rgb(46 31 24 / 0.72);
     text-decoration: none;
+  }
+
+  .site-header--overlay:not([data-scrolled]) .brand {
+    text-shadow: 0 1px 12px rgb(46 31 24 / 0.72);
   }
 
   .brand small {
@@ -134,9 +176,15 @@ const visibleNavigation = navigation.filter(
     place-items: center;
     border: 1px solid currentColor;
     border-radius: var(--radius-sm);
-    background: color-mix(in srgb, var(--color-text) 30%, transparent);
+    background: transparent;
     color: inherit;
     cursor: pointer;
+  }
+
+  .site-header--overlay:not([data-scrolled]) .menu-toggle,
+  .menu-toggle[aria-expanded='true'] {
+    background: color-mix(in srgb, var(--color-text) 30%, transparent);
+    color: var(--color-surface);
   }
 
   .close-icon,
@@ -189,13 +237,9 @@ const visibleNavigation = navigation.filter(
     text-transform: uppercase;
   }
 
-  .site-header--light .menu-toggle[aria-expanded='true'] {
-    color: var(--color-surface);
-  }
-
   @media (min-width: 62rem) {
     .site-header {
-      min-height: 7rem;
+      --header-height: calc(7rem + var(--safe-area-top));
     }
 
     .menu-toggle {
@@ -210,13 +254,11 @@ const visibleNavigation = navigation.filter(
       gap: var(--space-5);
       padding: 0;
       background: transparent;
-      text-shadow: 0 1px 12px rgb(46 31 24 / 0.72);
+      color: inherit;
     }
 
-    .site-header--light .brand,
-    .site-header--light .primary-navigation {
-      color: var(--color-text);
-      text-shadow: none;
+    .site-header--overlay:not([data-scrolled]) .primary-navigation {
+      text-shadow: 0 1px 12px rgb(46 31 24 / 0.72);
     }
 
     .primary-navigation ul {

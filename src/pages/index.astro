@@ -8,14 +8,20 @@ import ButtonLink from '@/components/global/ButtonLink.astro';
 import ResponsiveImage from '@/components/content/ResponsiveImage.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import { processSteps } from '@/lib/content';
-import { getPackages, getTestimonials } from '@/lib/sanity/content';
+import { getPackages, getSiteSettings, getTestimonials } from '@/lib/sanity/content';
 import { businessSchema } from '@/lib/seo/schema';
 
 const title = "Romantic Bridal Hair in Denver, Colorado | Em's Bridal Hair";
 const description =
   'Romantic, effortless bridal hairstyling and a thoughtfully paced wedding morning in Denver and across Colorado.';
 const siteUrl = import.meta.env.PUBLIC_SITE_URL || undefined;
-const [packages, testimonials] = await Promise.all([getPackages(), getTestimonials()]);
+const [packages, testimonials, settings] = await Promise.all([
+  getPackages(),
+  getTestimonials(),
+  getSiteSettings(),
+]);
+const experienceStats = settings?.experienceStats || [];
+const availability = settings?.bookingAvailability;
 ---
 
 <BaseLayout title={title} description={description} schema={businessSchema(siteUrl)}>
@@ -56,6 +62,30 @@ const [packages, testimonials] = await Promise.all([getPackages(), getTestimonia
         Explore the experience
       </ButtonLink>
     </div>
+  </section>
+
+  <section
+    id="trust-signals"
+    class="trust section-shell"
+    aria-labelledby="trust-title"
+    data-content-status={
+      experienceStats.every((stat) => stat.contentStatus === 'OWNER_APPROVED')
+        ? 'OWNER_APPROVED'
+        : 'UNRESOLVED'
+    }
+  >
+    <div class="trust-heading">
+      <p class="eyebrow">Experience behind the ease</p>
+      <h2 id="trust-title">A practiced hand for the moments that matter.</h2>
+    </div>
+    <dl>
+      {experienceStats.map((stat) => (
+        <div data-content-status={stat.contentStatus}>
+          <dt>{stat.label}</dt>
+          <dd>{stat.value}</dd>
+        </div>
+      ))}
+    </dl>
   </section>
 
   <section class="work" aria-labelledby="selected-work-title">
@@ -163,15 +193,36 @@ const [packages, testimonials] = await Promise.all([getPackages(), getTestimonia
     </div>
     <div class="quotes">
       {testimonials.map((testimonial) => (
-        <figure>
+        <figure data-content-status={testimonial.contentStatus}>
           <blockquote>“{testimonial.quote}”</blockquote>
-          <figcaption>{testimonial.clientName}</figcaption>
+          <figcaption>
+            {testimonial.clientName}
+            {testimonial.source && (
+              <span>
+                {' — '}
+                {testimonial.sourceUrl ? (
+                  <a href={testimonial.sourceUrl} target="_blank" rel="noreferrer">
+                    {testimonial.source}
+                  </a>
+                ) : (
+                  testimonial.source
+                )}
+              </span>
+            )}
+          </figcaption>
         </figure>
       ))}
     </div>
   </section>
 
   <section class="closing">
+    {availability && (
+      <div class="closing-availability" data-content-status={availability.contentStatus}>
+        <p class="eyebrow">{availability.eyebrow}</p>
+        <p class="availability-headline">{availability.headline}</p>
+        {availability.detail && <p>{availability.detail}</p>}
+      </div>
+    )}
     <p class="eyebrow">Your date, your people, your pace</p>
     <h2>Let the morning feel as beautiful as the finished look.</h2>
     <p>Tell Emily where you are getting ready and who will be in the chair.</p>
@@ -276,6 +327,49 @@ const [packages, testimonials] = await Promise.all([getPackages(), getTestimonia
   .work {
     padding-block: var(--space-6) var(--space-7);
     background: var(--color-background-soft);
+  }
+
+  .trust {
+    display: grid;
+    gap: var(--space-5);
+    padding-block: 0 var(--space-7);
+  }
+
+  .trust h2 {
+    max-width: 18ch;
+    margin-bottom: 0;
+    color: var(--color-accent);
+    font-size: var(--step-3);
+  }
+
+  .trust dl {
+    display: grid;
+    margin: 0;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .trust dl > div {
+    display: flex;
+    gap: var(--space-4);
+    align-items: baseline;
+    justify-content: space-between;
+    padding-block: var(--space-4);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .trust dt {
+    order: 2;
+    font-size: var(--step--1);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .trust dd {
+    margin: 0;
+    color: var(--color-text);
+    font-family: var(--font-display);
+    font-size: var(--step-4);
+    line-height: 1;
   }
 
   .work .section-title {
@@ -473,6 +567,24 @@ const [packages, testimonials] = await Promise.all([getPackages(), getTestimonia
     text-align: center;
   }
 
+  .closing-availability {
+    max-width: 44rem;
+    margin: 0 auto var(--space-6);
+    padding-bottom: var(--space-5);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .closing-availability .availability-headline {
+    margin-bottom: var(--space-2);
+    color: var(--color-text);
+    font-family: var(--font-display);
+    font-size: var(--step-2);
+  }
+
+  .closing-availability > p:last-child {
+    margin-bottom: 0;
+  }
+
   .closing h2 {
     max-width: 21ch;
     margin-inline: auto;
@@ -492,6 +604,34 @@ const [packages, testimonials] = await Promise.all([getPackages(), getTestimonia
     .proof {
       grid-template-columns: minmax(0, 1.15fr) minmax(18rem, 0.85fr);
       align-items: start;
+    }
+
+    .trust {
+      grid-template-columns: minmax(14rem, 0.65fr) minmax(0, 1.35fr);
+      align-items: start;
+    }
+
+    .trust dl {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .trust dl > div {
+      display: block;
+      padding-inline: var(--space-4);
+      border-right: 1px solid var(--color-border);
+    }
+
+    .trust dl > div:first-child {
+      padding-left: 0;
+    }
+
+    .trust dl > div:last-child {
+      padding-right: 0;
+      border-right: 0;
+    }
+
+    .trust dt {
+      margin-top: var(--space-3);
     }
 
     .editorial-grid {

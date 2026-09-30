@@ -1,8 +1,10 @@
 export const sanityQueries = {
   siteSettings: `*[_type == "siteSettings" && _id == "siteSettings" && contentStatus == "OWNER_APPROVED"][0]{
     contentStatus, businessName, shortName, tagline, publicEmail, publicPhone,
-    serviceAreas[]{placeName, placeType}, socialLinks[]{platform, url}, bookingAvailability,
-    inquiryIntro, responseTime, investmentNote
+    serviceAreas[]{placeName, placeType}, socialLinks[]{platform, url},
+    bookingAvailability{contentStatus, eyebrow, status, headline, detail, "years": coalesce(years, bookingYears), lastReviewedAt},
+    experienceStats[]{contentStatus, value, label, lastReviewedAt}, brandRecognition,
+    previewLocation, inquiryIntro, responseTime, investmentNote
   }`,
   packages: `*[_type == "package" && active == true && contentStatus == "OWNER_APPROVED"] | order(sortOrder asc){
     contentStatus, name, "slug": slug.current, summary, startingPrice, currency,
@@ -12,14 +14,16 @@ export const sanityQueries = {
     contentStatus, name, description, pricingType, price, currency, displayQualifier
   }`,
   testimonials: `*[_type == "testimonial" && publicationPermission == true && contentStatus == "OWNER_APPROVED"] | order(sortOrder asc){
-    contentStatus, quote, clientName, venue, location, publicationPermission
+    contentStatus, quote, clientName, venue, location, "source": sourceLabel, sourceUrl,
+    publicationPermission, featured
   }`,
-  galleryItems: `*[_type == "galleryItem" && contentStatus == "OWNER_APPROVED"] | order(sortOrder asc){
+  galleryItems: `*[_type == "galleryItem" && contentStatus == "OWNER_APPROVED" && publicationPermission == true] | order(sortOrder asc){
     contentStatus, caption, styleCategory, venue, location, photographerName, photographerUrl,
+    publicationPermission,
     "image": {"url": image.asset->url, "alt": image.alt, "width": image.asset->metadata.dimensions.width, "height": image.asset->metadata.dimensions.height}
   }`,
   faq: `*[_type == "faq" && active == true && contentStatus == "OWNER_APPROVED"] | order(sortOrder asc){
-    contentStatus, question, "answer": pt::text(answer), category, sortOrder
+    contentStatus, question, "answer": pt::text(answer), category, sortOrder, ownerDecisionKey
   }`,
   blogPosts: `*[_type == "blogPost" && contentStatus == "OWNER_APPROVED" && defined(publishedAt)] | order(publishedAt desc){
     contentStatus, "slug": slug.current, title, excerpt, "author": author.name,

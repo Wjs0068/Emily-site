@@ -15,12 +15,10 @@ const description =
   'Share your wedding date, location, party size, and bridal hair vision with Emily for weddings in Denver and across Colorado.';
 const [settings, packages] = await Promise.all([getSiteSettings(), getPackages()]);
 const lowestPackage = [...packages].sort((a, b) => a.startingPrice - b.startingPrice)[0];
-const availabilityHeadline =
-  settings?.bookingAvailability?.headline ||
-  'Every date and wedding morning is reviewed personally.';
+const availabilityHeadline = settings?.bookingAvailability?.headline || 'Now booking 2027';
 const availabilityDetail =
-  settings?.bookingAvailability?.detail ||
-  'Share your date, getting-ready location, and service count so availability can be confirmed around the full shape of your morning.';
+  settings?.bookingAvailability?.detail || 'A limited number of Colorado wedding dates remain.';
+const availabilityEyebrow = settings?.bookingAvailability?.eyebrow || 'Current availability';
 const investmentNote =
   settings?.investmentNote ||
   (lowestPackage
@@ -68,8 +66,12 @@ if (siteUrl) {
     </div>
   </section>
 
-  <section class="availability section-shell" aria-labelledby="availability-heading">
-    <p class="eyebrow">Current availability</p>
+  <section
+    class="availability section-shell"
+    aria-labelledby="availability-heading"
+    data-content-status={settings?.bookingAvailability?.contentStatus || 'UNRESOLVED'}
+  >
+    <p class="eyebrow">{availabilityEyebrow}</p>
     <div>
       <h2 id="availability-heading">{availabilityHeadline}</h2>
       <p>{availabilityDetail}</p>
@@ -150,7 +152,7 @@ if (siteUrl) {
       <HoneyBookInquiryForm
         formUrl={publicEnv.PUBLIC_HONEYBOOK_FORM_URL || undefined}
         fallbackEmail={contactEmail}
-        privacyUrl={publicEnv.PUBLIC_PRIVACY_POLICY_URL || undefined}
+        privacyUrl="/privacy/"
       />
     </div>
   </section>

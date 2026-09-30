@@ -2,9 +2,11 @@ import { createClient } from '@sanity/client';
 
 import {
   addons as fallbackAddons,
+  developmentSiteSettings,
   faqCategories as fallbackFaqCategories,
   journalPosts as fallbackBlogPosts,
   packages as fallbackPackages,
+  requiredFaqDecisionKeys,
   testimonials as fallbackTestimonials,
 } from '@/lib/content';
 import { isProductionContent, publicEnv } from '@/lib/env';
@@ -51,6 +53,20 @@ export async function getSiteSettings(): Promise<SiteSettingsResult | undefined>
       !settings.businessName && 'businessName',
       !settings.publicEmail && 'publicEmail',
       !settings.bookingAvailability && 'bookingAvailability',
+      settings.bookingAvailability?.contentStatus !== 'OWNER_APPROVED' &&
+        'bookingAvailability.contentStatus',
+      !settings.bookingAvailability?.eyebrow && 'bookingAvailability.eyebrow',
+      !settings.bookingAvailability?.years?.length && 'bookingAvailability.years',
+      !settings.bookingAvailability?.lastReviewedAt && 'bookingAvailability.lastReviewedAt',
+      settings.experienceStats?.length !== 3 && 'experienceStats',
+      settings.experienceStats?.some((item) => item.contentStatus !== 'OWNER_APPROVED') &&
+        'experienceStats.contentStatus',
+      settings.brandRecognition &&
+        settings.brandRecognition.contentStatus !== 'OWNER_APPROVED' &&
+        'brandRecognition.contentStatus',
+      settings.previewLocation &&
+        settings.previewLocation.contentStatus !== 'OWNER_APPROVED' &&
+        'previewLocation.contentStatus',
       !settings.responseTime && 'responseTime',
       !settings.investmentNote && 'investmentNote',
       settings.serviceAreas.length === 0 && 'serviceAreas',
@@ -60,8 +76,11 @@ export async function getSiteSettings(): Promise<SiteSettingsResult | undefined>
     }
     return settings;
   }
-  if (client) return client.fetch<SiteSettingsResult | undefined>(sanityQueries.siteSettings);
-  return undefined;
+  if (client) {
+    const settings = await client.fetch<SiteSettingsResult | undefined>(sanityQueries.siteSettings);
+    if (settings) return settings;
+  }
+  return developmentSiteSettings;
 }
 
 export async function getPackages(): Promise<PackageResult[]> {
@@ -75,7 +94,23 @@ export async function getPackages(): Promise<PackageResult[]> {
       }).format(item.startingPrice),
     }));
   if (isProductionContent) {
-    return formatPackages(await fetchRequired('packages', sanityQueries.packages));
+    const items = await fetchRequired<Array<Omit<PackageResult, 'price'>>>(
+      'packages',
+      sanityQueries.packages,
+    );
+    const unsafe = items.find(
+      (item) =>
+        item.startingPrice === 1600 ||
+        [item.name, item.summary, item.partySize, ...item.features].some((value) =>
+          /classic package|\$1,?600/i.test(value),
+        ),
+    );
+    if (unsafe) {
+      throw new Error(
+        `Production package validation failed for “${unsafe.name}”: stale minimum or retired package language found.`,
+      );
+    }
+    return formatPackages(items);
   }
   if (client) {
     return formatPackages(
@@ -152,7 +187,17 @@ export async function getGalleryItems(): Promise<GalleryItemResult[]> {
 }
 
 export async function getFaqs(): Promise<FaqResult[]> {
-  if (isProductionContent) return fetchRequired('FAQ entries', sanityQueries.faq);
+  if (isProductionContent) {
+    const items = await fetchRequired<FaqResult[]>('FAQ entries', sanityQueries.faq);
+    const approvedKeys = new Set(items.map((item) => item.ownerDecisionKey).filter(Boolean));
+    const missingKeys = requiredFaqDecisionKeys.filter((key) => !approvedKeys.has(key));
+    if (missingKeys.length > 0) {
+      throw new Error(
+        `Production FAQ validation failed. Owner-approved answers missing for: ${missingKeys.join(', ')}.`,
+      );
+    }
+    return items;
+  }
   if (client) return client.fetch<FaqResult[]>(sanityQueries.faq);
   const categoryKeys = ['booking', 'services', 'preview', 'travel', 'weddingDay'] as const;
   return fallbackFaqCategories.flatMap((category, categoryIndex) =>
@@ -164,6 +209,7 @@ export async function getFaqs(): Promise<FaqResult[]> {
       answer: item.answer,
       category: categoryKeys[categoryIndex],
       sortOrder: categoryIndex * 100 + itemIndex,
+      ownerDecisionKey: item.ownerDecisionKey,
     })),
   );
 }

@@ -17,11 +17,29 @@ export interface SiteSettingsResult {
   serviceAreas: Array<{ placeName: string; placeType: 'city' | 'region' | 'state' }>;
   socialLinks: Array<{ platform: string; url: string }>;
   bookingAvailability?: {
+    contentStatus: ContentStatus;
+    eyebrow: string;
     status: 'open' | 'limited' | 'waitlist' | 'closed';
     headline: string;
     detail?: string;
-    bookingYears: number[];
+    years: number[];
     lastReviewedAt: string;
+  };
+  experienceStats: Array<{
+    contentStatus: ContentStatus;
+    value: string;
+    label: string;
+    lastReviewedAt?: string;
+  }>;
+  brandRecognition?: {
+    contentStatus: ContentStatus;
+    text: string;
+  };
+  previewLocation?: {
+    contentStatus: ContentStatus;
+    name: string;
+    locality: string;
+    region: string;
   };
   inquiryIntro?: string;
   responseTime?: string;
@@ -59,7 +77,10 @@ export interface TestimonialResult {
   clientName: string;
   venue?: string;
   location?: string;
+  source?: string;
+  sourceUrl?: string;
   publicationPermission: boolean;
+  featured: boolean;
 }
 
 export interface GalleryItemResult {
@@ -71,6 +92,7 @@ export interface GalleryItemResult {
   location?: string;
   photographerName?: string;
   photographerUrl?: string;
+  publicationPermission: boolean;
 }
 
 export interface FaqResult {
@@ -79,6 +101,7 @@ export interface FaqResult {
   answer: string;
   category: 'booking' | 'services' | 'preview' | 'travel' | 'weddingDay';
   sortOrder: number;
+  ownerDecisionKey?: string;
 }
 
 export interface BlogPostResult {

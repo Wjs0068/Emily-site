@@ -1,6 +1,12 @@
 ---
 import ButtonLink from './ButtonLink.astro';
 import { publicEnv } from '@/lib/env';
+import { getSiteSettings } from '@/lib/sanity/content';
+
+const settings = await getSiteSettings();
+const instagram = settings?.socialLinks.find((link) => link.platform.toLowerCase() === 'instagram');
+const publicEmail = settings?.publicEmail || publicEnv.PUBLIC_CONTACT_EMAIL || undefined;
+const publicPhone = settings?.publicPhone || undefined;
 ---
 
 <footer class="site-footer">
@@ -19,9 +25,14 @@ import { publicEnv } from '@/lib/env';
     <p>&copy; {new Date().getFullYear()} Em's Bridal Hair</p>
     <nav aria-label="Footer">
       <a href="/services/">Services</a>
-      {publicEnv.PUBLIC_PRIVACY_POLICY_URL && (
-        <a href={publicEnv.PUBLIC_PRIVACY_POLICY_URL}>Privacy</a>
+      {publicEmail && <a href={`mailto:${publicEmail}`}>Email</a>}
+      {publicPhone && <a href={`tel:${publicPhone.replaceAll(/[^+\d]/g, '')}`}>Phone</a>}
+      {instagram && (
+        <a href={instagram.url} target="_blank" rel="noreferrer">
+          Instagram
+        </a>
       )}
+      <a href="/privacy/">Privacy</a>
     </nav>
   </div>
 </footer>

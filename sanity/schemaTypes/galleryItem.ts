@@ -61,6 +61,16 @@ export default defineType({
       validation: (Rule) => Rule.uri({ scheme: ['https'] }),
     }),
     defineField({
+      name: 'publicationPermission',
+      title: 'Publication permission confirmed',
+      type: 'boolean',
+      initialValue: false,
+      validation: (Rule) =>
+        Rule.required().custom(
+          (permission) => permission === true || 'Confirm image rights before publishing.',
+        ),
+    }),
+    defineField({
       name: 'relatedBlogPost',
       title: 'Related journal post',
       type: 'reference',

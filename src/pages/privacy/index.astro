@@ -1,0 +1,318 @@
+---
+import Breadcrumbs from '@/components/content/Breadcrumbs.astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { buildEnv, publicEnv } from '@/lib/env';
+import { getSiteSettings } from '@/lib/sanity/content';
+import { breadcrumbSchema } from '@/lib/seo/schema';
+
+// DRAFT — OWNER / LEGAL REVIEW REQUIRED BEFORE PRODUCTION
+const title = "Privacy Policy | Em's Bridal Hair";
+const description =
+  "A plain-language explanation of how Em's Bridal Hair handles information submitted through this website.";
+const settings = await getSiteSettings();
+const contactEmail = settings?.publicEmail || publicEnv.PUBLIC_CONTACT_EMAIL || undefined;
+const isDraft = buildEnv.PRIVACY_POLICY_STATUS !== 'OWNER_APPROVED';
+const siteUrl = publicEnv.PUBLIC_SITE_URL || undefined;
+const schemas = siteUrl
+  ? [
+      breadcrumbSchema([
+        { name: 'Home', url: siteUrl },
+        { name: 'Privacy', url: new URL('/privacy/', siteUrl).toString() },
+      ]),
+    ]
+  : [];
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  headerTheme="light"
+  schema={schemas}
+  robots={isDraft ? 'noindex,nofollow' : undefined}
+>
+  <article class="privacy section-shell">
+    <header class="privacy-heading">
+      <Breadcrumbs items={[{ label: 'Home', href: '/' }, { label: 'Privacy' }]} />
+      <p class="eyebrow">Privacy</p>
+      <h1>Privacy policy</h1>
+      <p class="updated">Last updated September 29, 2026</p>
+      {isDraft && (
+        <aside class="draft-notice" role="note">
+          <strong>Draft — owner / legal review required before production.</strong>
+          <p>
+            This page describes the website’s planned data practices. It has not been represented as
+            attorney-reviewed or guaranteed legally compliant.
+          </p>
+        </aside>
+      )}
+      <p class="introduction">
+        This policy explains what information may be handled when you visit this website or send a
+        wedding-hair inquiry, why it is used, and how to ask a privacy question.
+      </p>
+    </header>
+
+    <div class="privacy-body">
+      <section aria-labelledby="operator-heading">
+        <h2 id="operator-heading">1. Who operates this site</h2>
+        <p>
+          This website is operated by Em’s Bridal Hair, a bridal hairstyling business serving Denver
+          and Colorado. In this policy, “we,” “us,” and “our” refer to Em’s Bridal Hair.
+        </p>
+      </section>
+
+      <section aria-labelledby="provided-heading">
+        <h2 id="provided-heading">2. Information you may provide</h2>
+        <p>
+          If you submit an inquiry, you may provide your name, email address, phone number, wedding
+          date, venue, getting-ready location, requested service count, styling preferences,
+          extension interest, Instagram handle, referral source, budget or investment information,
+          and notes you choose to share. HoneyBook controls the final fields shown in its form,
+          including any text-message consent it requests.
+        </p>
+        <p>
+          Please do not send financial, medical, or other sensitive personal information that is not
+          needed to discuss bridal hairstyling services.
+        </p>
+      </section>
+
+      <section aria-labelledby="automatic-heading">
+        <h2 id="automatic-heading">3. Information collected automatically</h2>
+        <p>
+          Like most websites, the site’s infrastructure may process basic technical information such
+          as an IP address, browser and device type, pages requested, request times, referring
+          pages, and security or error logs. Cloudflare may process this information to deliver,
+          protect, and monitor the site. If Google Analytics 4 is enabled, it may also collect
+          general usage and interaction information.
+        </p>
+      </section>
+
+      <section aria-labelledby="use-heading">
+        <h2 id="use-heading">4. How inquiry information is used</h2>
+        <p>
+          Inquiry information is used to review availability, understand the requested services and
+          wedding logistics, respond to you, prepare a proposal, communicate about booking, and
+          provide services if you become a client. It may also be used to maintain business records,
+          protect the site, prevent misuse, and meet legal obligations.
+        </p>
+      </section>
+
+      <section aria-labelledby="honeybook-heading">
+        <h2 id="honeybook-heading">5. HoneyBook and the inquiry form</h2>
+        <p>
+          The inquiry form is provided by HoneyBook and may appear as an embedded form or open on a
+          HoneyBook page. Information entered in that form is sent to and processed through
+          HoneyBook under its own terms and privacy practices. The website does not claim that a
+          cross-origin form submission can be observed or confirmed by site analytics.
+        </p>
+      </section>
+
+      <section aria-labelledby="infrastructure-heading">
+        <h2 id="infrastructure-heading">6. Hosting, security, and content systems</h2>
+        <p>
+          Cloudflare provides website hosting, delivery, and security services and may process
+          network and security data for those purposes. Sanity is used to manage website content; it
+          is not intended to be a customer-lead database. Inquiry details should be handled in
+          HoneyBook or the approved business communication channel, not stored as Sanity content.
+        </p>
+      </section>
+
+      <section aria-labelledby="analytics-heading">
+        <h2 id="analytics-heading">7. Analytics</h2>
+        {publicEnv.PUBLIC_GA_MEASUREMENT_ID ? (
+          <p>
+            Google Analytics 4 is currently configured on this site to help understand general site
+            use and improve page performance. Google may process information about your device and
+            interactions according to its own privacy practices.
+          </p>
+        ) : (
+          <p>
+            Google Analytics 4 is not currently configured. If it is enabled later, this policy
+            should be reviewed and the site’s consent or notice approach reassessed before launch.
+          </p>
+        )}
+      </section>
+
+      <section aria-labelledby="cookies-heading">
+        <h2 id="cookies-heading">8. Cookies and similar technologies</h2>
+        <p>
+          The site itself may use browser storage or similar technologies needed for site behavior.
+          Third-party services, including HoneyBook and Google Analytics if enabled, may set or read
+          cookies or use comparable technologies under their own practices. Browser settings may let
+          you limit cookies, though doing so can affect embedded features.
+        </p>
+      </section>
+
+      <section aria-labelledby="providers-heading">
+        <h2 id="providers-heading">9. Service providers</h2>
+        <p>
+          Information may be handled by service providers that support the website and business,
+          such as HoneyBook for inquiries and client workflows, Cloudflare for hosting and security,
+          Sanity for website content, and Google Analytics when analytics is enabled. Information
+          may also be disclosed when reasonably necessary to comply with law, protect rights or
+          safety, or respond to a valid legal request.
+        </p>
+      </section>
+
+      <section aria-labelledby="retention-heading">
+        <h2 id="retention-heading">10. Data retention</h2>
+        <p>
+          Information is kept only as long as reasonably needed for the inquiry, booking, service,
+          recordkeeping, security, dispute-resolution, and legal purposes that apply. Retention can
+          vary based on whether an inquiry becomes a client relationship and on the settings and
+          policies of the service providers involved. No exact retention period is promised here.
+        </p>
+      </section>
+
+      <section aria-labelledby="security-heading">
+        <h2 id="security-heading">11. Data security</h2>
+        <p>
+          Reasonable administrative and technical safeguards are used for the website and approved
+          business tools. No internet transmission or storage method can be guaranteed completely
+          secure, so visitors should share only information needed for the inquiry.
+        </p>
+      </section>
+
+      <section aria-labelledby="children-heading">
+        <h2 id="children-heading">12. Children’s privacy</h2>
+        <p>
+          This site and its inquiry process are intended for adults arranging wedding services, not
+          for children under 13. We do not knowingly ask children under 13 to submit personal
+          information through the inquiry form. A parent or guardian may contact us with a concern.
+        </p>
+      </section>
+
+      <section aria-labelledby="requests-heading">
+        <h2 id="requests-heading">13. Colorado and U.S. privacy requests</h2>
+        <p>
+          Depending on where you live and the law that applies, you may be able to ask about,
+          correct, or request deletion of personal information held by the business. Send a request
+          using the contact method below. We may need to verify the request and may retain
+          information when permitted or required by law. This general explanation is not a claim of
+          certification under any particular privacy law.
+        </p>
+      </section>
+
+      <section aria-labelledby="links-heading">
+        <h2 id="links-heading">14. External links</h2>
+        <p>
+          The site may link to HoneyBook, Instagram, venues, photographers, or other external sites.
+          Their privacy, accessibility, and security practices are controlled by those third
+          parties, not by this website.
+        </p>
+      </section>
+
+      <section aria-labelledby="changes-heading">
+        <h2 id="changes-heading">15. Changes to this policy</h2>
+        <p>
+          This policy may be updated when the site’s tools or data practices change. The “last
+          updated” date will be revised when a new version is posted. Material changes should be
+          reviewed before the updated policy is treated as production-ready.
+        </p>
+      </section>
+
+      <section aria-labelledby="contact-heading">
+        <h2 id="contact-heading">16. Privacy questions</h2>
+        {contactEmail ? (
+          <p>
+            Email privacy questions or requests to{' '}
+            <a href={`mailto:${contactEmail}`}>{contactEmail}</a>.
+          </p>
+        ) : (
+          <p>
+            Until a public privacy email is confirmed, use the <a href="/inquire/">inquiry page</a>
+            and begin the message with “Privacy question.” Do not include sensitive information.
+          </p>
+        )}
+      </section>
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .section-shell {
+    width: min(100%, calc(var(--layout-width) + 2 * var(--gutter)));
+    margin-inline: auto;
+    padding-inline: var(--gutter);
+  }
+
+  .privacy {
+    padding-block: var(--space-6) var(--space-8);
+  }
+
+  .privacy-heading {
+    max-width: 58rem;
+    margin-bottom: var(--space-7);
+  }
+
+  .privacy-heading :global(.breadcrumbs) {
+    margin-bottom: var(--space-7);
+  }
+
+  .privacy h1 {
+    margin-bottom: var(--space-3);
+    color: var(--color-accent);
+    font-size: var(--step-5);
+  }
+
+  .updated {
+    color: var(--color-text);
+    font-size: var(--step--1);
+  }
+
+  .introduction {
+    max-width: 48rem;
+    margin-top: var(--space-5);
+    font-size: var(--step-1);
+  }
+
+  .draft-notice {
+    max-width: 48rem;
+    margin-top: var(--space-5);
+    padding: var(--space-4);
+    border: 1px solid var(--color-border);
+    background: var(--color-background-soft);
+  }
+
+  .draft-notice strong {
+    display: block;
+    margin-bottom: var(--space-2);
+    font-size: var(--step--1);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .draft-notice p {
+    margin: 0;
+  }
+
+  .privacy-body {
+    max-width: 50rem;
+    margin-left: auto;
+  }
+
+  .privacy-body section {
+    padding-block: var(--space-5);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .privacy-body h2 {
+    max-width: 26ch;
+    margin-bottom: var(--space-3);
+    color: var(--color-text);
+    font-size: var(--step-2);
+  }
+
+  .privacy-body p:last-child {
+    margin-bottom: 0;
+  }
+
+  @media (min-width: 56rem) {
+    .privacy-heading {
+      margin-left: 8%;
+    }
+
+    .privacy-body {
+      margin-right: 8%;
+    }
+  }
+</style>

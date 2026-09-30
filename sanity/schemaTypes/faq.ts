@@ -66,6 +66,13 @@ export default defineType({
     }),
     defineField({ name: 'active', title: 'Active', type: 'boolean', initialValue: true }),
     defineField({
+      name: 'ownerDecisionKey',
+      title: 'Owner decision key',
+      description:
+        'Used by production validation for business-policy answers that require approval.',
+      type: 'string',
+    }),
+    defineField({
       name: 'sortOrder',
       title: 'Sort order',
       type: 'number',
