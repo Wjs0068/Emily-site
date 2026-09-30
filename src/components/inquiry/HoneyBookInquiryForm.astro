@@ -1,0 +1,160 @@
+---
+interface Props {
+  formUrl?: string;
+  fallbackEmail?: string;
+  privacyUrl?: string;
+}
+
+const { formUrl, fallbackEmail, privacyUrl } = Astro.props;
+---
+
+<div class="inquiry-provider" data-inquiry-provider>
+  {formUrl ? (
+    <>
+      <div class="embed-shell" data-embed-shell aria-busy="true">
+        <p class="loading-state" data-loading-state role="status">
+          Loading the secure inquiry form…
+        </p>
+        <iframe
+          src={formUrl}
+          title="Wedding hair inquiry form"
+          loading="lazy"
+          referrerpolicy="strict-origin-when-cross-origin"
+          data-honeybook-frame
+        ></iframe>
+      </div>
+      <div class="form-fallback">
+        <p>
+          If the embedded form does not load,{' '}
+          <a href={formUrl} target="_blank" rel="noreferrer" data-inquiry-link>
+            open the secure form in a new window
+          </a>
+          .
+        </p>
+        {fallbackEmail && (
+          <p>
+            You can also email <a href={`mailto:${fallbackEmail}`}>{fallbackEmail}</a>.
+          </p>
+        )}
+      </div>
+      <p class="privacy-note">
+        The form is provided by HoneyBook. Information entered inside it is handled under
+        HoneyBook's privacy and accessibility practices; some browser and assistive-technology
+        behavior is outside this site's control.{' '}
+        {privacyUrl && <a href={privacyUrl}>Read this site's privacy policy.</a>}
+      </p>
+    </>
+  ) : (
+    <section class="development-placeholder" aria-labelledby="form-setup-title">
+      <p class="eyebrow">Development integration placeholder</p>
+      <h3 id="form-setup-title">The owner-approved HoneyBook form is not configured yet.</h3>
+      <p>
+        Set <code>INQUIRY_PROVIDER=honeybook</code> and provide the approved public embed or form
+        URL as <code>PUBLIC_HONEYBOOK_FORM_URL</code>. No account ID or private credential belongs
+        in source control.
+      </p>
+      <p>The HoneyBook form should be configured to collect:</p>
+      <ul>
+        <li>Name, email, and phone</li>
+        <li>Wedding date, venue, and getting-ready location</li>
+        <li>Number of people needing hair</li>
+        <li>Desired style and how certain the bride feels</li>
+        <li>Extension interest</li>
+        <li>Instagram handle and referral source</li>
+        <li>Wedding details and notes</li>
+      </ul>
+    </section>
+  )}
+</div>
+
+<script>
+  const provider = document.querySelector<HTMLElement>('[data-inquiry-provider]');
+  const frame = provider?.querySelector<HTMLIFrameElement>('[data-honeybook-frame]');
+  const shell = provider?.querySelector<HTMLElement>('[data-embed-shell]');
+  const loadingState = provider?.querySelector<HTMLElement>('[data-loading-state]');
+
+  const trackStart = () => {
+    if (!provider || provider.dataset.started === 'true') return;
+    provider.dataset.started = 'true';
+    window.gtag?.('event', 'inquiry_start');
+  };
+
+  frame?.addEventListener('load', () => {
+    shell?.setAttribute('aria-busy', 'false');
+    loadingState?.setAttribute('hidden', '');
+  });
+
+  document.querySelectorAll<HTMLElement>('[data-inquiry-link]').forEach((link) => {
+    link.addEventListener('click', trackStart, { once: true });
+  });
+
+  window.addEventListener('blur', () => {
+    if (document.activeElement === frame) trackStart();
+  });
+</script>
+
+<style>
+  .embed-shell {
+    position: relative;
+    min-height: 62rem;
+    background: var(--color-surface);
+  }
+
+  iframe {
+    display: block;
+    width: 100%;
+    min-height: 62rem;
+    border: 0;
+    background: var(--color-surface);
+  }
+
+  .loading-state {
+    position: absolute;
+    inset: var(--space-5) auto auto 50%;
+    margin: 0;
+    translate: -50% 0;
+  }
+
+  .form-fallback,
+  .privacy-note {
+    max-width: 48rem;
+    margin-top: var(--space-4);
+    font-size: var(--step--1);
+  }
+
+  .form-fallback p {
+    margin-bottom: var(--space-2);
+  }
+
+  .development-placeholder {
+    padding-block: var(--space-5);
+    border-block: 1px solid var(--color-border);
+  }
+
+  .development-placeholder h3 {
+    max-width: 26ch;
+    margin-bottom: var(--space-3);
+    font-size: var(--step-2);
+  }
+
+  .development-placeholder p,
+  .development-placeholder ul {
+    max-width: 50rem;
+  }
+
+  code {
+    font-family: ui-monospace, monospace;
+    font-size: 0.9em;
+  }
+
+  @media (min-width: 48rem) {
+    .embed-shell,
+    iframe {
+      min-height: 70rem;
+    }
+  }
+</style>
+
+<script is:inline>
+  window.gtag = window.gtag || undefined;
+</script>

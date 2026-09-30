@@ -1,0 +1,246 @@
+---
+import { Menu, X } from '@lucide/astro';
+
+import { navigation } from '@/lib/content';
+import { publicEnv } from '@/lib/env';
+
+interface Props {
+  theme?: 'overlay' | 'light';
+}
+
+const { theme = 'overlay' } = Astro.props;
+const currentPath = Astro.url.pathname;
+const isCurrent = (href: string) => currentPath === href || currentPath.startsWith(href);
+const visibleNavigation = navigation.filter(
+  (item) => item.href !== '/journal/' || publicEnv.PUBLIC_SHOW_JOURNAL === 'true',
+);
+---
+
+<header class:list={['site-header', { 'site-header--light': theme === 'light' }]} data-header>
+  <a class="brand" href="/" aria-label="Em's Bridal Hair, home">
+    <span>Em's</span>
+    <small>Bridal Hair</small>
+  </a>
+
+  <button
+    class="menu-toggle"
+    type="button"
+    aria-expanded="false"
+    aria-controls="primary-navigation"
+    aria-label="Open navigation"
+    data-menu-toggle
+  >
+    <Menu class="menu-icon" aria-hidden="true" size={23} stroke-width={1.5} />
+    <X class="close-icon" aria-hidden="true" size={23} stroke-width={1.5} />
+  </button>
+
+  <nav id="primary-navigation" class="primary-navigation" aria-label="Primary" data-navigation>
+    <ul>
+      {visibleNavigation.map((item) => (
+        <li>
+          <a href={item.href} aria-current={isCurrent(item.href) ? 'page' : undefined}>
+            {item.label}
+          </a>
+        </li>
+      ))}
+    </ul>
+    <a class="inquire-link" href="/inquire/">
+      Inquire
+    </a>
+  </nav>
+</header>
+
+<script>
+  const header = document.querySelector<HTMLElement>('[data-header]');
+  const toggle = header?.querySelector<HTMLButtonElement>('[data-menu-toggle]');
+  const navigation = header?.querySelector<HTMLElement>('[data-navigation]');
+
+  const closeMenu = (restoreFocus = false) => {
+    if (!toggle || !navigation) return;
+    toggle.setAttribute('aria-expanded', 'false');
+    toggle.setAttribute('aria-label', 'Open navigation');
+    navigation.removeAttribute('data-open');
+    document.body.classList.remove('menu-open');
+    if (restoreFocus) toggle.focus();
+  };
+
+  toggle?.addEventListener('click', () => {
+    if (!toggle || !navigation) return;
+    const isOpen = toggle.getAttribute('aria-expanded') === 'true';
+    if (isOpen) {
+      closeMenu();
+      return;
+    }
+
+    toggle.setAttribute('aria-expanded', 'true');
+    toggle.setAttribute('aria-label', 'Close navigation');
+    navigation.setAttribute('data-open', '');
+    document.body.classList.add('menu-open');
+    navigation.querySelector<HTMLAnchorElement>('a')?.focus();
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && toggle?.getAttribute('aria-expanded') === 'true') {
+      closeMenu(true);
+    }
+  });
+
+  window.matchMedia('(min-width: 62rem)').addEventListener('change', (event) => {
+    if (event.matches) closeMenu();
+  });
+</script>
+
+<style>
+  .site-header {
+    position: absolute;
+    inset: 0 0 auto;
+    z-index: 20;
+    display: flex;
+    min-height: 6rem;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-3) var(--gutter);
+    color: var(--color-surface);
+  }
+
+  .site-header--light {
+    position: relative;
+    color: var(--color-text);
+  }
+
+  .brand {
+    display: inline-flex;
+    flex-direction: column;
+    font-size: clamp(1.5rem, 2.2vw, 2.125rem);
+    line-height: 1;
+    text-shadow: 0 1px 12px rgb(46 31 24 / 0.72);
+    text-decoration: none;
+  }
+
+  .brand small {
+    margin-top: 0.4rem;
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  .menu-toggle {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    width: 2.875rem;
+    height: 2.875rem;
+    place-items: center;
+    border: 1px solid currentColor;
+    border-radius: var(--radius-sm);
+    background: color-mix(in srgb, var(--color-text) 30%, transparent);
+    color: inherit;
+    cursor: pointer;
+  }
+
+  .close-icon,
+  .menu-toggle[aria-expanded='true'] .menu-icon {
+    display: none;
+  }
+
+  .menu-toggle[aria-expanded='true'] .close-icon {
+    display: block;
+  }
+
+  .primary-navigation {
+    position: fixed;
+    inset: 0;
+    display: none;
+    min-height: 100dvh;
+    padding: 7.5rem var(--gutter) var(--space-5);
+    background: var(--color-text);
+    color: var(--color-surface);
+  }
+
+  .primary-navigation[data-open] {
+    display: block;
+  }
+
+  .primary-navigation ul {
+    display: grid;
+    gap: var(--space-3);
+    margin: 0 0 var(--space-5);
+    padding: 0;
+    list-style: none;
+  }
+
+  .primary-navigation a {
+    display: inline-flex;
+    min-height: 2.75rem;
+    align-items: center;
+    font-size: var(--step-2);
+    text-decoration: none;
+  }
+
+  .primary-navigation a[aria-current='page'] {
+    text-decoration: underline;
+    text-underline-offset: 0.45rem;
+  }
+
+  .inquire-link {
+    border-bottom: 1px solid currentColor;
+    font-size: var(--step-1) !important;
+    text-transform: uppercase;
+  }
+
+  .site-header--light .menu-toggle[aria-expanded='true'] {
+    color: var(--color-surface);
+  }
+
+  @media (min-width: 62rem) {
+    .site-header {
+      min-height: 7rem;
+    }
+
+    .menu-toggle {
+      display: none;
+    }
+
+    .primary-navigation {
+      position: static;
+      display: flex;
+      min-height: auto;
+      align-items: center;
+      gap: var(--space-5);
+      padding: 0;
+      background: transparent;
+      text-shadow: 0 1px 12px rgb(46 31 24 / 0.72);
+    }
+
+    .site-header--light .brand,
+    .site-header--light .primary-navigation {
+      color: var(--color-text);
+      text-shadow: none;
+    }
+
+    .primary-navigation ul {
+      display: flex;
+      align-items: center;
+      gap: clamp(1rem, 2.1vw, 2rem);
+      margin: 0;
+    }
+
+    .primary-navigation a {
+      min-height: 2.75rem;
+      font-size: 0.9375rem;
+      letter-spacing: 0.04em;
+    }
+
+    .brand small {
+      font-size: 0.75rem;
+    }
+
+    .inquire-link {
+      border: 1px solid currentColor;
+      padding: 0 1rem;
+      font-size: 0.9375rem !important;
+      text-decoration: none;
+    }
+  }
+</style>

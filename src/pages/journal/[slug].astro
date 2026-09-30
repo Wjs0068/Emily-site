@@ -1,0 +1,348 @@
+---
+import stylingImage from '@/assets/source/01-branding-3399.jpg';
+import detailImage from '@/assets/source/04-bride-015a0371.jpg';
+import portraitImage from '@/assets/source/05-lauren.jpeg';
+import Breadcrumbs from '@/components/content/Breadcrumbs.astro';
+import ResponsiveImage from '@/components/content/ResponsiveImage.astro';
+import ButtonLink from '@/components/global/ButtonLink.astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { getBlogPosts } from '@/lib/sanity/content';
+import { blogPostingSchema, breadcrumbSchema } from '@/lib/seo/schema';
+
+export async function getStaticPaths() {
+  const journalPosts = await getBlogPosts();
+  return journalPosts.map((post) => ({
+    params: { slug: post.slug },
+    props: { post },
+  }));
+}
+
+type Post = Awaited<ReturnType<typeof getBlogPosts>>[number];
+interface Props {
+  post: Post;
+}
+
+const { post } = Astro.props;
+const journalPosts = await getBlogPosts();
+const siteUrl = import.meta.env.PUBLIC_SITE_URL || undefined;
+const articleUrl = siteUrl ? new URL(`/journal/${post.slug}/`, siteUrl).toString() : undefined;
+const featuredImages = { styling: stylingImage, updo: detailImage, waves: portraitImage };
+const featuredAlts = {
+  styling: 'Emily shaping soft waves during a bridal styling session',
+  updo: 'Textured bridal updo with loose face-framing pieces',
+  waves: 'Bride turning to show long, softly curled hair',
+};
+const inlineImages = { detail: detailImage, portrait: portraitImage };
+const relatedPosts = post.relatedSlugs
+  .map((slug) => journalPosts.find((candidate) => candidate.slug === slug))
+  .filter((candidate): candidate is Post => Boolean(candidate));
+const dateFormatter = new Intl.DateTimeFormat('en-US', {
+  month: 'long',
+  day: 'numeric',
+  year: 'numeric',
+  timeZone: 'UTC',
+});
+const title = `${post.title} | Em's Bridal Hair`;
+const isDevelopmentSample = post.isDevelopmentSample === true;
+const featuredImage =
+  typeof post.featuredImage === 'string'
+    ? featuredImages[post.featuredImage]
+    : post.featuredImage.url;
+const featuredAlt =
+  typeof post.featuredImage === 'string'
+    ? featuredAlts[post.featuredImage]
+    : post.featuredImage.alt;
+const schemas = isDevelopmentSample
+  ? []
+  : [
+      blogPostingSchema({
+        headline: post.title,
+        description: post.excerpt,
+        authorName: post.author,
+        datePublished: post.publishedAt,
+        dateModified: post.updatedAt,
+        url: articleUrl,
+        image:
+          siteUrl && typeof featuredImage !== 'string' && featuredImage.src
+            ? new URL(featuredImage.src, siteUrl).toString()
+            : typeof featuredImage === 'string'
+              ? featuredImage
+              : undefined,
+      }),
+    ];
+
+if (siteUrl) {
+  schemas.push(
+    breadcrumbSchema([
+      { name: 'Home', url: siteUrl },
+      { name: 'Journal', url: new URL('/journal/', siteUrl).toString() },
+      { name: post.title, url: articleUrl! },
+    ]),
+  );
+}
+---
+
+<BaseLayout
+  title={title}
+  description={post.excerpt}
+  socialImage={typeof featuredImage === 'string' ? featuredImage : featuredImage.src}
+  ogType="article"
+  headerTheme="light"
+  schema={schemas}
+  robots={isDevelopmentSample ? 'noindex,nofollow' : undefined}
+>
+  <article>
+    <header class="article-header section-shell">
+      <Breadcrumbs
+        items={[
+          { label: 'Home', href: '/' },
+          { label: 'Journal', href: '/journal/' },
+          { label: post.title },
+        ]}
+      />
+      {isDevelopmentSample && (
+        <p class="sample-label">Sample development post · Not authored by Emily</p>
+      )}
+      <p class="eyebrow">{post.category}</p>
+      <h1>{post.title}</h1>
+      <p class="article-excerpt">{post.excerpt}</p>
+      <div class="article-meta">
+        <span>By {post.author}</span>
+        <span>
+          Published{' '}
+          <time datetime={post.publishedAt}>
+            {dateFormatter.format(new Date(post.publishedAt))}
+          </time>
+        </span>
+        {post.updatedAt && (
+          <span>
+            Updated{' '}
+            <time datetime={post.updatedAt}>{dateFormatter.format(new Date(post.updatedAt))}</time>
+          </span>
+        )}
+      </div>
+    </header>
+
+    <figure class="featured-image">
+      <ResponsiveImage
+        src={featuredImage}
+        alt={featuredAlt}
+        width={typeof post.featuredImage === 'string' ? undefined : post.featuredImage.width}
+        height={typeof post.featuredImage === 'string' ? undefined : post.featuredImage.height}
+        widths={[640, 960, 1440, 1920]}
+        sizes="100vw"
+        loading="eager"
+        fetchpriority="high"
+      />
+    </figure>
+
+    <div class="article-body">
+      {post.body.map((block) => {
+        if (block.type === 'heading') {
+          return block.level === 2 ? <h2>{block.text}</h2> : <h3>{block.text}</h3>;
+        }
+
+        if (block.type === 'image') {
+          return (
+            <figure class="inline-image">
+              <ResponsiveImage
+                src={typeof block.image === 'string' ? inlineImages[block.image] : block.image.url}
+                alt={typeof block.image === 'string' ? block.alt : block.image.alt}
+                width={typeof block.image === 'string' ? undefined : block.image.width}
+                height={typeof block.image === 'string' ? undefined : block.image.height}
+                widths={[480, 720, 960]}
+                sizes="(min-width: 48rem) 43rem, 100vw"
+              />
+              {block.caption && <figcaption>{block.caption}</figcaption>}
+            </figure>
+          );
+        }
+
+        return <p>{block.text}</p>;
+      })}
+    </div>
+  </article>
+
+  <aside class="related section-shell" aria-labelledby="related-heading">
+    <p class="eyebrow">Continue reading</p>
+    <h2 id="related-heading">{isDevelopmentSample ? 'Related sample posts' : 'Related posts'}</h2>
+    <div class="related-links">
+      {relatedPosts.map((relatedPost) => (
+        <a href={`/journal/${relatedPost.slug}/`}>
+          <span>{relatedPost.category}</span>
+          <strong>{relatedPost.title}</strong>
+        </a>
+      ))}
+    </div>
+  </aside>
+
+  <section class="article-cta">
+    <div class="section-shell article-cta-inner">
+      <p class="eyebrow">See the real work</p>
+      <h2>Explore romantic bridal hair created for Colorado wedding mornings.</h2>
+      <ButtonLink href="/portfolio/">View the portfolio</ButtonLink>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .section-shell {
+    width: min(100%, calc(var(--layout-width) + 2 * var(--gutter)));
+    margin-inline: auto;
+    padding-inline: var(--gutter);
+  }
+
+  .article-header {
+    padding-block: var(--space-6) var(--space-7);
+  }
+
+  .article-header :global(.breadcrumbs) {
+    margin-bottom: var(--space-6);
+  }
+
+  .sample-label {
+    display: inline-block;
+    margin-bottom: var(--space-5);
+    padding: var(--space-1) var(--space-2);
+    border: 1px solid var(--color-text);
+    font-size: var(--step--1);
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  .article-header h1 {
+    max-width: 15ch;
+    margin-bottom: var(--space-4);
+    color: var(--color-accent);
+    font-size: var(--step-5);
+  }
+
+  .article-excerpt {
+    max-width: 44rem;
+    font-size: var(--step-1);
+  }
+
+  .article-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-4);
+    color: var(--color-text);
+    font-size: var(--step--1);
+  }
+
+  .featured-image {
+    width: min(100%, var(--wide-width));
+    max-height: 55rem;
+    margin: 0 auto;
+    overflow: hidden;
+  }
+
+  .featured-image :global(img) {
+    width: 100%;
+    max-height: 55rem;
+    object-fit: cover;
+  }
+
+  .article-body {
+    width: min(100%, calc(var(--content-width) + 2 * var(--gutter)));
+    margin-inline: auto;
+    padding: var(--space-7) var(--gutter) var(--space-8);
+  }
+
+  .article-body > p {
+    margin-bottom: var(--space-4);
+    font-size: var(--step-1);
+    line-height: 1.85;
+  }
+
+  .article-body h2 {
+    margin: var(--space-7) 0 var(--space-4);
+    color: var(--color-accent);
+    font-size: var(--step-3);
+  }
+
+  .article-body h3 {
+    margin: var(--space-6) 0 var(--space-3);
+    font-size: var(--step-2);
+  }
+
+  .inline-image {
+    margin: var(--space-6) 0;
+  }
+
+  .inline-image :global(img) {
+    width: 100%;
+  }
+
+  .inline-image figcaption {
+    padding-top: var(--space-2);
+    color: var(--color-text);
+    font-size: var(--step--1);
+  }
+
+  .related {
+    padding-block: var(--space-7);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .related h2 {
+    margin-bottom: var(--space-5);
+    font-size: var(--step-3);
+  }
+
+  .related-links {
+    display: grid;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .related-links a {
+    display: grid;
+    gap: var(--space-2);
+    padding-block: var(--space-4);
+    border-bottom: 1px solid var(--color-border);
+    text-decoration: none;
+  }
+
+  .related-links span {
+    color: var(--color-text);
+    font-size: var(--step--1);
+  }
+
+  .related-links strong {
+    font-family: var(--font-display);
+    font-size: var(--step-1);
+    font-weight: 400;
+  }
+
+  .article-cta {
+    padding-block: var(--space-7);
+    background: var(--color-sage);
+    color: var(--color-surface);
+  }
+
+  .article-cta .eyebrow {
+    color: var(--color-surface);
+  }
+
+  .article-cta-inner {
+    max-width: 62rem;
+  }
+
+  .article-cta h2 {
+    max-width: 19ch;
+    margin-bottom: var(--space-5);
+    font-size: var(--step-4);
+  }
+
+  @media (min-width: 48rem) {
+    .related-links {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-6);
+      border-top: 0;
+    }
+
+    .related-links a {
+      border-top: 1px solid var(--color-border);
+    }
+  }
+</style>

@@ -1,0 +1,236 @@
+---
+import stylingImage from '@/assets/source/01-branding-3399.jpg';
+import updoImage from '@/assets/source/04-bride-015a0371.jpg';
+import wavesImage from '@/assets/source/05-lauren.jpeg';
+import Breadcrumbs from '@/components/content/Breadcrumbs.astro';
+import ResponsiveImage from '@/components/content/ResponsiveImage.astro';
+import ButtonLink from '@/components/global/ButtonLink.astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { getBlogPosts } from '@/lib/sanity/content';
+import { breadcrumbSchema } from '@/lib/seo/schema';
+
+const title = "Bridal Hair Journal | Em's Bridal Hair";
+const description =
+  'Development preview of the Em’s Bridal Hair journal for Colorado wedding-morning stories, bridal previews, and romantic style notes.';
+const siteUrl = import.meta.env.PUBLIC_SITE_URL || undefined;
+const seoDescription = description.includes('Development')
+  ? "Development preview of the Em's Bridal Hair journal for Colorado wedding-morning stories, bridal previews, and romantic style notes."
+  : description;
+const journalPosts = await getBlogPosts();
+const hasDevelopmentSamples = journalPosts.some((post) => post.isDevelopmentSample);
+const schemas = siteUrl
+  ? [
+      breadcrumbSchema([
+        { name: 'Home', url: siteUrl },
+        { name: 'Journal', url: new URL('/journal/', siteUrl).toString() },
+      ]),
+    ]
+  : [];
+const imageMap = { styling: stylingImage, updo: updoImage, waves: wavesImage };
+const imageAlts = {
+  styling: 'Emily shaping soft waves during a bridal styling session',
+  updo: 'Textured bridal updo with loose face-framing pieces',
+  waves: 'Bride turning to show long, softly curled hair',
+};
+const dateFormatter = new Intl.DateTimeFormat('en-US', {
+  month: 'long',
+  day: 'numeric',
+  year: 'numeric',
+  timeZone: 'UTC',
+});
+const postImage = (post: (typeof journalPosts)[number]) =>
+  typeof post.featuredImage === 'string' ? imageMap[post.featuredImage] : post.featuredImage.url;
+const postAlt = (post: (typeof journalPosts)[number]) =>
+  typeof post.featuredImage === 'string' ? imageAlts[post.featuredImage] : post.featuredImage.alt;
+---
+
+<BaseLayout
+  title={title}
+  description={seoDescription}
+  headerTheme="light"
+  schema={schemas}
+  robots={hasDevelopmentSamples || journalPosts.length === 0 ? 'noindex,nofollow' : undefined}
+>
+  <section class="journal-heading section-shell">
+    <Breadcrumbs items={[{ label: 'Home', href: '/' }, { label: 'Journal' }]} />
+    <p class="eyebrow">The journal</p>
+    <h1>Notes on beauty, intention, and the morning around it.</h1>
+    <p>
+      {hasDevelopmentSamples
+        ? "This journal is being prepared for Emily's stories and expertise. The entries below are development samples for testing the reading experience and are not authored by Emily."
+        : 'Thoughtful notes from Emily on bridal styling, preparation, and the wedding morning.'}
+    </p>
+  </section>
+
+  <section class="journal-list section-shell" aria-label="Sample journal posts">
+    {journalPosts.map((post, index) => (
+      <article class:list={['post-preview', { 'post-preview--featured': index === 0 }]}>
+        <a class="post-image" href={`/journal/${post.slug}/`} aria-label={`Read ${post.title}`}>
+          <ResponsiveImage
+            src={postImage(post)}
+            alt={postAlt(post)}
+            width={typeof post.featuredImage === 'string' ? undefined : post.featuredImage.width}
+            height={typeof post.featuredImage === 'string' ? undefined : post.featuredImage.height}
+            widths={[480, 768, 1080, 1440]}
+            sizes={
+              index === 0 ? '(min-width: 48rem) 62vw, 100vw' : '(min-width: 48rem) 38vw, 100vw'
+            }
+            loading={index === 0 ? 'eager' : 'lazy'}
+            fetchpriority={index === 0 ? 'high' : 'auto'}
+          />
+        </a>
+        <div class="post-copy">
+          {post.isDevelopmentSample && <p class="sample-label">Sample development post</p>}
+          <p class="post-meta">
+            <span>{post.category}</span>
+            <time datetime={post.publishedAt}>
+              {dateFormatter.format(new Date(post.publishedAt))}
+            </time>
+          </p>
+          <h2>
+            <a href={`/journal/${post.slug}/`}>{post.title}</a>
+          </h2>
+          <p>{post.excerpt}</p>
+          <ButtonLink href={`/journal/${post.slug}/`} variant="text">
+            {post.isDevelopmentSample ? 'Read sample article' : 'Read article'}
+          </ButtonLink>
+        </div>
+      </article>
+    ))}
+  </section>
+
+  <section class="journal-closing">
+    <div class="section-shell journal-closing-inner">
+      <p class="eyebrow">Until the final stories arrive</p>
+      <h2>See the work behind the future journal.</h2>
+      <ButtonLink href="/portfolio/" variant="outline">
+        View the portfolio
+      </ButtonLink>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .section-shell {
+    width: min(100%, calc(var(--layout-width) + 2 * var(--gutter)));
+    margin-inline: auto;
+    padding-inline: var(--gutter);
+  }
+
+  .journal-heading {
+    padding-block: var(--space-6) var(--space-7);
+  }
+
+  .journal-heading :global(.breadcrumbs) {
+    margin-bottom: var(--space-7);
+  }
+
+  .journal-heading h1 {
+    max-width: 16ch;
+    margin-bottom: var(--space-4);
+    color: var(--color-accent);
+    font-size: var(--step-5);
+  }
+
+  .journal-heading > p:last-child {
+    max-width: 48rem;
+    margin: 0;
+    font-size: var(--step-1);
+  }
+
+  .journal-list {
+    display: grid;
+    gap: var(--space-7);
+    padding-bottom: var(--space-8);
+  }
+
+  .post-preview {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  .post-image {
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+  }
+
+  .post-image :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .post-preview--featured .post-image {
+    aspect-ratio: 5 / 4;
+  }
+
+  .post-preview--featured .post-image :global(img) {
+    object-position: 52% center;
+  }
+
+  .sample-label {
+    display: inline-block;
+    margin-bottom: var(--space-3);
+    padding: var(--space-1) var(--space-2);
+    border: 1px solid var(--color-text);
+    font-size: var(--step--1);
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  .post-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-4);
+    margin-bottom: var(--space-3);
+    color: var(--color-text);
+    font-size: var(--step--1);
+  }
+
+  .post-preview h2 {
+    margin-bottom: var(--space-3);
+    color: var(--color-text);
+    font-size: var(--step-2);
+  }
+
+  .post-preview h2 a {
+    text-decoration: none;
+  }
+
+  .post-copy > p:not(.sample-label, .post-meta) {
+    max-width: 40rem;
+  }
+
+  .journal-closing {
+    padding-block: var(--space-7);
+    background: var(--color-background-alt);
+  }
+
+  .journal-closing-inner {
+    max-width: 58rem;
+    text-align: center;
+  }
+
+  .journal-closing h2 {
+    margin-bottom: var(--space-5);
+    font-size: var(--step-4);
+  }
+
+  @media (min-width: 48rem) {
+    .journal-list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      align-items: start;
+    }
+
+    .post-preview--featured {
+      grid-column: 1 / -1;
+      grid-template-columns: 1.3fr 0.7fr;
+      align-items: center;
+      gap: var(--space-6);
+    }
+
+    .post-preview:not(.post-preview--featured):nth-child(3) {
+      margin-top: var(--space-7);
+    }
+  }
+</style>

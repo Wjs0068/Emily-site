@@ -1,0 +1,17 @@
+{
+  "extends": "astro/tsconfigs/strict",
+  "include": [
+    ".astro/types.d.ts",
+    "src/**/*",
+    "sanity.config.ts",
+    "sanity.cli.ts",
+    "playwright.config.ts",
+    "tests/**/*"
+  ],
+  "exclude": ["dist", "studio-dist", "node_modules"],
+  "compilerOptions": {
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  }
+}

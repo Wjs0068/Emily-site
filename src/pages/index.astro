@@ -1,0 +1,570 @@
+---
+import heroImage from '@/assets/source/01-branding-3399.jpg';
+import bridalDetail from '@/assets/source/04-bride-015a0371.jpg';
+import bridePortrait from '@/assets/source/05-lauren.jpeg';
+import emilyPortrait from '@/assets/source/10-branding-3255.jpg';
+import stylingImage from '@/assets/source/02-branding-3944.jpg';
+import ButtonLink from '@/components/global/ButtonLink.astro';
+import ResponsiveImage from '@/components/content/ResponsiveImage.astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { processSteps } from '@/lib/content';
+import { getPackages, getTestimonials } from '@/lib/sanity/content';
+import { businessSchema } from '@/lib/seo/schema';
+
+const title = "Romantic Bridal Hair in Denver, Colorado | Em's Bridal Hair";
+const description =
+  'Romantic, effortless bridal hairstyling and a thoughtfully paced wedding morning in Denver and across Colorado.';
+const siteUrl = import.meta.env.PUBLIC_SITE_URL || undefined;
+const [packages, testimonials] = await Promise.all([getPackages(), getTestimonials()]);
+---
+
+<BaseLayout title={title} description={description} schema={businessSchema(siteUrl)}>
+  <section class="hero">
+    <ResponsiveImage
+      src={heroImage}
+      alt="Emily styling soft waves for a bridal look"
+      widths={[640, 960, 1440, 1920]}
+      sizes="100vw"
+      loading="eager"
+      fetchpriority="high"
+      class="hero-image"
+    />
+    <div class="hero-shade" aria-hidden="true"></div>
+    <div class="hero-content">
+      <p class="hero-location">Denver, Colorado</p>
+      <h1>Romantic bridal hair, made to feel effortless.</h1>
+      <p class="hero-copy">
+        Soft, lasting styles and a calm, considered experience for weddings across Colorado.
+      </p>
+      <ButtonLink href="/inquire/">Check your date</ButtonLink>
+    </div>
+    <p class="hero-note">Dreamy. Romantic. Effortless. Long-lasting.</p>
+  </section>
+
+  <section class="introduction section-shell">
+    <div class="intro-heading">
+      <p class="eyebrow">A softer kind of wedding morning</p>
+      <h2>Beautiful hair is only part of how the morning should feel.</h2>
+    </div>
+    <div class="intro-copy">
+      <p>
+        Your bridal style should move naturally, photograph beautifully, and still feel like you.
+        Emily pairs romantic texture with careful preparation, steady communication, and a timeline
+        made around your people.
+      </p>
+      <ButtonLink href="/services/" variant="text">
+        Explore the experience
+      </ButtonLink>
+    </div>
+  </section>
+
+  <section class="work" aria-labelledby="selected-work-title">
+    <div class="work-title section-shell">
+      <p class="eyebrow">Selected work</p>
+      <h2 id="selected-work-title" class="section-title">
+        Texture, movement, and details that hold.
+      </h2>
+    </div>
+    <div class="editorial-grid">
+      <figure class="editorial-image editorial-image--tall">
+        <ResponsiveImage
+          src={stylingImage}
+          alt="Bridal hair being shaped into loose, polished waves"
+          widths={[480, 768, 1080]}
+          sizes="(min-width: 48rem) 48vw, 88vw"
+        />
+      </figure>
+      <figure class="editorial-image editorial-image--detail">
+        <ResponsiveImage
+          src={bridalDetail}
+          alt="Textured bridal updo finished with loose face-framing pieces"
+          widths={[480, 768, 1080]}
+          sizes="(min-width: 48rem) 34vw, 76vw"
+        />
+      </figure>
+      <figure class="editorial-image editorial-image--landscape">
+        <ResponsiveImage
+          src={bridePortrait}
+          alt="Bride turning to show long, softly curled hair"
+          widths={[480, 768, 1080]}
+          sizes="(min-width: 48rem) 40vw, 86vw"
+        />
+      </figure>
+    </div>
+    <div class="work-link section-shell">
+      <ButtonLink href="/portfolio/" variant="text">
+        See more bridal hair
+      </ButtonLink>
+    </div>
+  </section>
+
+  <section class="packages section-shell" aria-labelledby="packages-title">
+    <div class="packages-heading">
+      <p class="eyebrow">Bridal packages</p>
+      <h2 id="packages-title" class="section-title">
+        Room for the people you want beside you.
+      </h2>
+      <p>
+        Every collection begins with the bride and includes a bridal preview and wedding-morning
+        planning.
+      </p>
+    </div>
+    <ol class="package-list">
+      {packages.map((item, index) => (
+        <li>
+          <span class="package-number">0{index + 1}</span>
+          <div class="package-copy">
+            <h3>{item.name}</h3>
+            <p>{item.summary}</p>
+          </div>
+          <p class="package-price">
+            <small>Starting at</small>
+            {item.price}
+          </p>
+          <p class="package-size">{item.partySize}</p>
+        </li>
+      ))}
+    </ol>
+    <ButtonLink href="/services/" variant="outline">
+      Compare packages
+    </ButtonLink>
+  </section>
+
+  <section class="experience" aria-labelledby="experience-title">
+    <div class="experience-image">
+      <ResponsiveImage
+        src={emilyPortrait}
+        alt="Emily, the bridal hairstylist behind Em's Bridal Hair"
+        widths={[480, 768, 1080, 1440]}
+        sizes="(min-width: 56rem) 48vw, 100vw"
+      />
+    </div>
+    <div class="experience-content">
+      <p class="eyebrow">The experience</p>
+      <h2 id="experience-title">Clear plans. Collaborative styling. A calm chair to land in.</h2>
+      <ol>
+        {processSteps.map((step) => (
+          <li>
+            <span>{step.number}</span>
+            <div>
+              <h3>{step.title}</h3>
+              <p>{step.body}</p>
+            </div>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <section class="proof section-shell" aria-labelledby="proof-title">
+    <div class="proof-heading">
+      <p class="eyebrow">In their words</p>
+      <h2 id="proof-title">The kind of confidence that lasts past the last pin.</h2>
+    </div>
+    <div class="quotes">
+      {testimonials.map((testimonial) => (
+        <figure>
+          <blockquote>“{testimonial.quote}”</blockquote>
+          <figcaption>{testimonial.clientName}</figcaption>
+        </figure>
+      ))}
+    </div>
+  </section>
+
+  <section class="closing">
+    <p class="eyebrow">Your date, your people, your pace</p>
+    <h2>Let the morning feel as beautiful as the finished look.</h2>
+    <p>Tell Emily where you are getting ready and who will be in the chair.</p>
+    <ButtonLink href="/inquire/">Start your inquiry</ButtonLink>
+  </section>
+</BaseLayout>
+
+<style>
+  .section-shell {
+    width: min(100%, calc(var(--layout-width) + 2 * var(--gutter)));
+    margin-inline: auto;
+    padding-inline: var(--gutter);
+  }
+
+  .hero {
+    position: relative;
+    display: grid;
+    min-height: min(54rem, 100svh);
+    align-items: end;
+    overflow: clip;
+    color: var(--color-surface);
+  }
+
+  .hero :global(.hero-image),
+  .hero-shade {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .hero :global(.hero-image) {
+    object-fit: cover;
+    object-position: 52% 30%;
+  }
+
+  .hero-shade {
+    background:
+      linear-gradient(180deg, rgb(46 31 24 / 0.44) 0%, transparent 32%),
+      linear-gradient(0deg, rgb(46 31 24 / 0.72) 0%, rgb(46 31 24 / 0.08) 64%);
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 1;
+    width: min(50rem, 100%);
+    padding: 9rem var(--gutter) clamp(7rem, 16vh, 10rem);
+  }
+
+  .hero-location {
+    margin-bottom: var(--space-3);
+    font-size: var(--step--1);
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .hero h1 {
+    max-width: 13ch;
+    margin-bottom: var(--space-4);
+    font-size: var(--step-5);
+  }
+
+  .hero-copy {
+    max-width: 36rem;
+    margin-bottom: var(--space-5);
+    font-size: var(--step-1);
+  }
+
+  .hero-note {
+    position: absolute;
+    right: var(--gutter);
+    bottom: var(--space-4);
+    z-index: 1;
+    margin: 0;
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .introduction {
+    display: grid;
+    gap: var(--space-5);
+    padding-block: var(--space-7);
+  }
+
+  .intro-heading h2 {
+    max-width: 20ch;
+    margin-bottom: 0;
+    color: var(--color-accent);
+    font-size: var(--step-4);
+  }
+
+  .intro-copy {
+    max-width: 38rem;
+  }
+
+  .intro-copy > p {
+    font-size: var(--step-1);
+  }
+
+  .work {
+    padding-block: var(--space-6) var(--space-7);
+    background: var(--color-background-soft);
+  }
+
+  .work .section-title {
+    color: var(--color-text);
+  }
+
+  .editorial-grid {
+    display: grid;
+    gap: var(--space-4);
+    padding-inline: var(--gutter);
+  }
+
+  .editorial-image {
+    margin: 0;
+    overflow: hidden;
+  }
+
+  .editorial-image :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .editorial-image--tall {
+    aspect-ratio: 4 / 5;
+  }
+
+  .editorial-image--detail {
+    width: 80%;
+    aspect-ratio: 3 / 4;
+    margin-left: auto;
+  }
+
+  .editorial-image--detail :global(img) {
+    object-position: 52% 26%;
+  }
+
+  .editorial-image--landscape {
+    width: 88%;
+    aspect-ratio: 5 / 4;
+  }
+
+  .work-link {
+    margin-top: var(--space-5);
+    text-align: right;
+  }
+
+  .packages {
+    padding-block: var(--space-7);
+  }
+
+  .packages-heading {
+    max-width: 42rem;
+    margin-bottom: var(--space-6);
+  }
+
+  .package-list {
+    margin: 0 0 var(--space-5);
+    padding: 0;
+    border-top: 1px solid var(--color-border);
+    list-style: none;
+  }
+
+  .package-list li {
+    display: grid;
+    gap: var(--space-3);
+    padding-block: var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .package-number {
+    color: var(--color-text);
+    font-size: var(--step--1);
+  }
+
+  .package-list h3 {
+    margin-bottom: var(--space-2);
+    font-size: var(--step-2);
+  }
+
+  .package-list p {
+    margin-bottom: 0;
+  }
+
+  .package-size {
+    color: var(--color-text);
+    font-size: 0.9375rem;
+  }
+
+  .package-price {
+    margin-top: var(--space-2);
+    font-size: var(--step-2);
+  }
+
+  .package-price small {
+    display: block;
+    color: var(--color-text);
+    font-size: var(--step--1);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .experience {
+    display: grid;
+    background: var(--color-sage);
+    color: var(--color-surface);
+  }
+
+  .experience-image {
+    min-height: 29rem;
+  }
+
+  .experience-image :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 28%;
+  }
+
+  .experience-content {
+    padding: var(--space-6) var(--gutter) var(--space-7);
+  }
+
+  .experience-content h2 {
+    max-width: 20ch;
+    margin-bottom: var(--space-6);
+    font-size: var(--step-4);
+  }
+
+  .experience-content .eyebrow {
+    color: var(--color-surface);
+  }
+
+  .experience-content ol {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .experience-content li {
+    display: grid;
+    grid-template-columns: 2.2rem minmax(0, 1fr);
+    gap: var(--space-3);
+    padding-block: var(--space-3);
+    border-top: 1px solid color-mix(in srgb, var(--color-surface) 45%, transparent);
+  }
+
+  .experience-content h3 {
+    margin-bottom: var(--space-1);
+    font-size: var(--step-1);
+  }
+
+  .experience-content p {
+    margin: 0;
+  }
+
+  .proof {
+    display: grid;
+    gap: var(--space-6);
+    padding-block: var(--space-7);
+  }
+
+  .proof h2 {
+    max-width: 18ch;
+    font-size: var(--step-4);
+  }
+
+  .quotes {
+    display: grid;
+    gap: var(--space-5);
+  }
+
+  .quotes figure {
+    margin: 0;
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .quotes blockquote {
+    margin: 0 0 var(--space-3);
+    font-size: var(--step-1);
+  }
+
+  .quotes figcaption {
+    color: var(--color-text);
+    font-size: var(--step--1);
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .closing {
+    padding: var(--space-7) var(--gutter);
+    background: var(--color-background-alt);
+    text-align: center;
+  }
+
+  .closing h2 {
+    max-width: 21ch;
+    margin-inline: auto;
+    margin-bottom: var(--space-3);
+    color: var(--color-text);
+    font-size: var(--step-4);
+  }
+
+  .closing > p:not(.eyebrow) {
+    max-width: 38rem;
+    margin-inline: auto;
+    margin-bottom: var(--space-4);
+  }
+
+  @media (min-width: 48rem) {
+    .introduction,
+    .proof {
+      grid-template-columns: minmax(0, 1.15fr) minmax(18rem, 0.85fr);
+      align-items: start;
+    }
+
+    .editorial-grid {
+      grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+      grid-template-rows: auto auto;
+      align-items: start;
+    }
+
+    .editorial-image--tall {
+      grid-row: 1 / span 2;
+    }
+
+    .editorial-image--detail {
+      width: 90%;
+      margin-top: var(--space-7);
+    }
+
+    .editorial-image--landscape {
+      width: 80%;
+      margin-left: -12%;
+    }
+
+    .package-list li {
+      grid-template-columns: 3rem minmax(0, 1.35fr) minmax(11rem, 0.45fr);
+      gap: var(--space-3) var(--space-4);
+      align-items: start;
+      padding-block: var(--space-5);
+    }
+
+    .package-number {
+      grid-column: 1;
+      grid-row: 1 / span 2;
+    }
+
+    .package-copy,
+    .package-size {
+      grid-column: 2;
+    }
+
+    .package-price {
+      grid-column: 3;
+      grid-row: 1 / span 2;
+      margin-top: 0;
+      text-align: right;
+    }
+
+    .package-size {
+      font-size: var(--step-0);
+    }
+  }
+
+  @media (min-width: 56rem) {
+    .experience {
+      grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    }
+
+    .experience-image {
+      min-height: 48rem;
+    }
+
+    .experience-content {
+      align-self: center;
+      padding: var(--space-7) clamp(3rem, 7vw, 7rem);
+    }
+  }
+
+  @media (min-width: 80rem) {
+    .hero-content {
+      margin-left: max(0rem, calc((100vw - var(--wide-width)) / 2));
+    }
+
+    .editorial-grid {
+      padding-inline: max(var(--gutter), calc((100vw - var(--wide-width)) / 2));
+    }
+  }
+</style>

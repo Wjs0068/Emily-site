@@ -1,0 +1,82 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Start Development Server",
+      "type": "shell",
+      "command": "npm.cmd",
+      "args": ["run", "dev"],
+      "isBackground": true,
+      "problemMatcher": []
+    },
+    {
+      "label": "Format Project",
+      "type": "shell",
+      "command": "npm.cmd",
+      "args": ["run", "format"],
+      "isBackground": false,
+      "problemMatcher": []
+    },
+    {
+      "label": "Check Formatting",
+      "type": "shell",
+      "command": "npm.cmd",
+      "args": ["run", "format:check"],
+      "isBackground": false,
+      "problemMatcher": [],
+      "group": "test"
+    },
+    {
+      "label": "Lint Project",
+      "type": "shell",
+      "command": "npm.cmd",
+      "args": ["run", "lint"],
+      "isBackground": false,
+      "problemMatcher": [],
+      "group": "test"
+    },
+    {
+      "label": "Check Project",
+      "type": "shell",
+      "command": "npm.cmd",
+      "args": ["run", "check"],
+      "isBackground": false,
+      "problemMatcher": [],
+      "group": "test"
+    },
+    {
+      "label": "Run End-to-End Tests",
+      "type": "shell",
+      "command": "npm.cmd",
+      "args": ["run", "test:e2e"],
+      "isBackground": false,
+      "problemMatcher": [],
+      "group": "test"
+    },
+    {
+      "label": "Capture Page Screenshots",
+      "type": "shell",
+      "command": "npm.cmd",
+      "args": ["run", "screenshots"],
+      "isBackground": false,
+      "problemMatcher": []
+    },
+    {
+      "label": "Build Production Site",
+      "type": "shell",
+      "command": "npm.cmd",
+      "args": ["run", "build"],
+      "isBackground": false,
+      "problemMatcher": [],
+      "group": "build"
+    },
+    {
+      "label": "Start Sanity Studio",
+      "type": "shell",
+      "command": "npm.cmd",
+      "args": ["run", "studio"],
+      "isBackground": true,
+      "problemMatcher": []
+    }
+  ]
+}

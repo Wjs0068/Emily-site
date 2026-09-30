@@ -1,0 +1,450 @@
+---
+import planningImage from '@/assets/source/06-branding-2805.jpg';
+import heroImage from '@/assets/source/12-branding-4201.jpg';
+import closingImage from '@/assets/source/15-img-1514.jpg';
+import Breadcrumbs from '@/components/content/Breadcrumbs.astro';
+import ResponsiveImage from '@/components/content/ResponsiveImage.astro';
+import HoneyBookInquiryForm from '@/components/inquiry/HoneyBookInquiryForm.astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { publicEnv } from '@/lib/env';
+import { getPackages, getSiteSettings } from '@/lib/sanity/content';
+import { breadcrumbSchema, serviceSchema } from '@/lib/seo/schema';
+
+const title = "Wedding Hair Inquiry | Denver & Colorado | Em's Bridal Hair";
+const description =
+  'Share your wedding date, location, party size, and bridal hair vision with Emily for weddings in Denver and across Colorado.';
+const [settings, packages] = await Promise.all([getSiteSettings(), getPackages()]);
+const lowestPackage = [...packages].sort((a, b) => a.startingPrice - b.startingPrice)[0];
+const availabilityHeadline =
+  settings?.bookingAvailability?.headline ||
+  'Every date and wedding morning is reviewed personally.';
+const availabilityDetail =
+  settings?.bookingAvailability?.detail ||
+  'Share your date, getting-ready location, and service count so availability can be confirmed around the full shape of your morning.';
+const investmentNote =
+  settings?.investmentNote ||
+  (lowestPackage
+    ? `Published bridal collections currently begin at ${lowestPackage.price}. Travel, timing, staffing, and additions are confirmed in your proposal.`
+    : 'Investment is confirmed after the date, location, service count, timing, and artist coverage are reviewed.');
+const responseTime =
+  settings?.responseTime || 'Response timing will be stated in the HoneyBook confirmation.';
+const contactEmail = settings?.publicEmail || publicEnv.PUBLIC_CONTACT_EMAIL || undefined;
+const siteUrl = publicEnv.PUBLIC_SITE_URL || undefined;
+const schemas = [serviceSchema(siteUrl)];
+
+if (siteUrl) {
+  schemas.push(
+    breadcrumbSchema([
+      { name: 'Home', url: siteUrl },
+      { name: 'Inquire', url: new URL('/inquire/', siteUrl).toString() },
+    ]),
+  );
+}
+---
+
+<BaseLayout title={title} description={description} headerTheme="light" schema={schemas}>
+  <section class="inquiry-hero">
+    <div class="hero-image">
+      <ResponsiveImage
+        src={heroImage}
+        alt="Emily smiling while refining a client's bridal hairstyle"
+        widths={[640, 960, 1440]}
+        sizes="(min-width: 56rem) 48vw, 100vw"
+        loading="eager"
+        fetchpriority="high"
+      />
+    </div>
+    <div class="hero-copy">
+      <Breadcrumbs items={[{ label: 'Home', href: '/' }, { label: 'Inquire' }]} />
+      <p class="eyebrow">Begin here</p>
+      <h1>Tell me what you want the morning to feel like.</h1>
+      <p>
+        Start with the practical details, then share the style, people, and atmosphere you are
+        picturing. You do not need to have every answer yet.
+      </p>
+      <a class="text-link" href="#wedding-inquiry">
+        Go to the inquiry form
+      </a>
+    </div>
+  </section>
+
+  <section class="availability section-shell" aria-labelledby="availability-heading">
+    <p class="eyebrow">Current availability</p>
+    <div>
+      <h2 id="availability-heading">{availabilityHeadline}</h2>
+      <p>{availabilityDetail}</p>
+    </div>
+  </section>
+
+  <section class="essentials">
+    <div class="section-shell essentials-grid">
+      <article>
+        <span>01</span>
+        <p class="eyebrow">Investment</p>
+        <h2>A clear starting point before you reach out.</h2>
+        <p>{investmentNote}</p>
+        <a href="/services/">Review bridal collections</a>
+      </article>
+      <article>
+        <span>02</span>
+        <p class="eyebrow">Denver + Colorado</p>
+        <h2>On-location styling, shaped around where you are getting ready.</h2>
+        <p>
+          Emily serves Denver and celebrations across Colorado. Include both the venue and the
+          getting-ready location so travel and timing can be considered accurately.
+        </p>
+      </article>
+    </div>
+  </section>
+
+  <section class="after-inquiry section-shell" aria-labelledby="after-inquiry-heading">
+    <div class="after-heading">
+      <p class="eyebrow">What happens next</p>
+      <h2 id="after-inquiry-heading">A considered reply, then a clear path forward.</h2>
+    </div>
+    <div class="after-layout">
+      <div class="after-image">
+        <ResponsiveImage
+          src={planningImage}
+          alt="Emily reviewing wedding details at her laptop"
+          widths={[480, 768, 1080]}
+          sizes="(min-width: 48rem) 42vw, 100vw"
+        />
+      </div>
+      <ol>
+        <li>
+          <span>01</span>
+          <div>
+            <h3>Your details are reviewed</h3>
+            <p>Date, location, party size, timing, and artist coverage are considered together.</p>
+          </div>
+        </li>
+        <li>
+          <span>02</span>
+          <div>
+            <h3>You receive the right next step</h3>
+            <p>If the date is available, the proposal makes services, travel, and terms clear.</p>
+          </div>
+        </li>
+        <li>
+          <span>03</span>
+          <div>
+            <h3>The planning becomes personal</h3>
+            <p>Once reserved, styling direction and the wedding-morning timeline take shape.</p>
+          </div>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <section id="wedding-inquiry" class="form-section" aria-labelledby="form-heading">
+    <div class="section-shell">
+      <header class="form-heading">
+        <p class="eyebrow">Wedding inquiry</p>
+        <h2 id="form-heading">Your date, your people, your vision.</h2>
+        <p>
+          The more context you share, the more useful the first reply can be. Required fields and
+          final qualification questions are managed in Emily's approved HoneyBook form.
+        </p>
+      </header>
+      <HoneyBookInquiryForm
+        formUrl={publicEnv.PUBLIC_HONEYBOOK_FORM_URL || undefined}
+        fallbackEmail={contactEmail}
+        privacyUrl={publicEnv.PUBLIC_PRIVACY_POLICY_URL || undefined}
+      />
+    </div>
+  </section>
+
+  <section class="response section-shell" aria-labelledby="response-heading">
+    <div>
+      <p class="eyebrow">After you press send</p>
+      <h2 id="response-heading">You will know your inquiry arrived.</h2>
+    </div>
+    <div>
+      <p>{responseTime}</p>
+      {contactEmail ? (
+        <p>
+          If you do not receive a confirmation, email{' '}
+          <a href={`mailto:${contactEmail}`}>{contactEmail}</a>.
+        </p>
+      ) : (
+        <p>If the embed is unavailable, use the direct HoneyBook link shown beside the form.</p>
+      )}
+      <p>
+        Only share details needed to discuss the wedding and services. Do not include financial,
+        medical, or other sensitive personal information.
+      </p>
+    </div>
+  </section>
+
+  <section class="reassurance">
+    <div class="reassurance-image">
+      <ResponsiveImage
+        src={closingImage}
+        alt="Bride with softly styled hair standing beside her partner outdoors"
+        widths={[640, 960, 1440]}
+        sizes="(min-width: 48rem) 50vw, 100vw"
+      />
+    </div>
+    <div class="reassurance-copy">
+      <p class="eyebrow">One thoughtful step</p>
+      <h2>You do not need a finished vision to begin.</h2>
+      <p>
+        Bring what you know now. Emily will help turn the references, logistics, and feeling you
+        want into a plan that supports the whole morning.
+      </p>
+      <a href="#wedding-inquiry">Start your inquiry</a>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .section-shell {
+    width: min(100%, calc(var(--layout-width) + 2 * var(--gutter)));
+    margin-inline: auto;
+    padding-inline: var(--gutter);
+  }
+
+  .inquiry-hero {
+    display: grid;
+    background: var(--color-background-alt);
+  }
+
+  .hero-image {
+    min-height: 31rem;
+    overflow: hidden;
+  }
+
+  .hero-image :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 28%;
+  }
+
+  .hero-copy {
+    align-self: center;
+    padding: var(--space-6) var(--gutter) var(--space-7);
+  }
+
+  .hero-copy :global(.breadcrumbs) {
+    margin-bottom: var(--space-6);
+  }
+
+  .hero-copy h1 {
+    max-width: 12ch;
+    margin-bottom: var(--space-4);
+    color: var(--color-text);
+    font-size: var(--step-5);
+  }
+
+  .hero-copy > p:not(.eyebrow) {
+    max-width: 38rem;
+    font-size: var(--step-1);
+  }
+
+  .text-link {
+    display: inline-block;
+    margin-top: var(--space-2);
+    font-size: var(--step--1);
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .availability {
+    display: grid;
+    gap: var(--space-4);
+    padding-block: var(--space-7);
+  }
+
+  .availability h2 {
+    max-width: 21ch;
+    margin-bottom: var(--space-3);
+    font-size: var(--step-4);
+  }
+
+  .availability div {
+    max-width: 45rem;
+  }
+
+  .essentials {
+    padding-block: var(--space-7);
+    background: var(--color-sage);
+    color: var(--color-surface);
+  }
+
+  .essentials-grid {
+    display: grid;
+    gap: var(--space-6);
+  }
+
+  .essentials article {
+    padding-top: var(--space-4);
+    border-top: 1px solid color-mix(in srgb, var(--color-surface) 45%, transparent);
+  }
+
+  .essentials article > span {
+    float: right;
+    font-size: var(--step--1);
+  }
+
+  .essentials .eyebrow {
+    color: var(--color-surface);
+  }
+
+  .essentials h2 {
+    max-width: 19ch;
+    margin-bottom: var(--space-3);
+    font-size: var(--step-3);
+  }
+
+  .after-inquiry {
+    padding-block: var(--space-7) var(--space-8);
+  }
+
+  .after-heading {
+    max-width: 50rem;
+    margin-bottom: var(--space-6);
+  }
+
+  .after-heading h2 {
+    max-width: 20ch;
+    font-size: var(--step-4);
+  }
+
+  .after-layout {
+    display: grid;
+    gap: var(--space-5);
+  }
+
+  .after-image {
+    min-height: 30rem;
+    overflow: hidden;
+  }
+
+  .after-image :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 24%;
+  }
+
+  .after-layout ol {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .after-layout li {
+    display: grid;
+    grid-template-columns: 2.25rem minmax(0, 1fr);
+    gap: var(--space-3);
+    padding-block: var(--space-4);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .after-layout h3 {
+    margin-bottom: var(--space-2);
+    font-size: var(--step-1);
+  }
+
+  .after-layout p {
+    margin: 0;
+  }
+
+  .form-section {
+    padding-block: var(--space-7) var(--space-8);
+    background: var(--color-background-soft);
+  }
+
+  .form-heading {
+    max-width: 54rem;
+    margin-bottom: var(--space-6);
+  }
+
+  .form-heading h2 {
+    max-width: 18ch;
+    margin-bottom: var(--space-3);
+    color: var(--color-text);
+    font-size: var(--step-4);
+  }
+
+  .response {
+    display: grid;
+    gap: var(--space-5);
+    padding-block: var(--space-7);
+  }
+
+  .response h2 {
+    max-width: 18ch;
+    font-size: var(--step-4);
+  }
+
+  .response > div:last-child {
+    max-width: 46rem;
+  }
+
+  .reassurance {
+    display: grid;
+    background: var(--color-background-alt);
+  }
+
+  .reassurance-image {
+    min-height: 31rem;
+    overflow: hidden;
+  }
+
+  .reassurance-image :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 28%;
+  }
+
+  .reassurance-copy {
+    align-self: center;
+    padding: var(--space-7) var(--gutter);
+  }
+
+  .reassurance-copy h2 {
+    max-width: 17ch;
+    margin-bottom: var(--space-4);
+    font-size: var(--step-4);
+  }
+
+  .reassurance-copy p:not(.eyebrow) {
+    max-width: 39rem;
+  }
+
+  @media (min-width: 48rem) {
+    .availability,
+    .response {
+      grid-template-columns: minmax(0, 0.7fr) minmax(24rem, 1.3fr);
+    }
+
+    .essentials-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-7);
+    }
+
+    .after-layout {
+      grid-template-columns: minmax(0, 0.9fr) minmax(24rem, 1.1fr);
+      align-items: center;
+      gap: var(--space-7);
+    }
+  }
+
+  @media (min-width: 56rem) {
+    .inquiry-hero,
+    .reassurance {
+      grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+      min-height: 46rem;
+    }
+
+    .hero-image,
+    .reassurance-image {
+      min-height: 46rem;
+    }
+  }
+</style>

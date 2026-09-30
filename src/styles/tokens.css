@@ -1,0 +1,70 @@
+:root {
+  /* Extracted from Wix theme variables and verified against computed styles. */
+  --color-background: #f5ece3;
+  --color-background-alt: #ede0d4;
+  --color-background-soft: #f1e6dc;
+  --color-surface: #fefcf1;
+  --color-text: #5c4033;
+  --color-text-muted: #6b705c;
+  --color-accent: #a67d74;
+  --color-accent-secondary: #ede0d4;
+  --color-sage: #6b705c;
+  --color-sage-soft: #b1d3bb;
+  --color-border: #a67d74;
+  --color-on-dark: #f5ece3;
+  --color-focus: #5c4033;
+
+  --font-display: 'Fahkwang', sans-serif;
+  --font-body: 'Fahkwang', sans-serif;
+
+  --step--1: 0.8125rem;
+  --step-0: 1rem;
+  --step-1: 1.125rem;
+  --step-2: 1.4rem;
+  --step-3: 1.8rem;
+  --step-4: 2.35rem;
+  --step-5: 3rem;
+
+  --space-1: 0.375rem;
+  --space-2: 0.625rem;
+  --space-3: 1rem;
+  --space-4: 1.5rem;
+  --space-5: 2.25rem;
+  --space-6: 3.5rem;
+  --space-7: 5.5rem;
+  --space-8: 8rem;
+
+  --content-width: 43rem;
+  --layout-width: 76rem;
+  --wide-width: 92rem;
+  --gutter: clamp(1.25rem, 4vw, 4.5rem);
+
+  --radius-sm: 0.125rem;
+  --radius-md: 0.375rem;
+
+  --duration-fast: 160ms;
+  --duration-medium: 360ms;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (min-width: 48rem) {
+  :root {
+    --step-0: 1.0625rem;
+    --step-1: 1.25rem;
+    --step-2: 1.625rem;
+    --step-3: 2.125rem;
+    --step-4: 3rem;
+    --step-5: 4rem;
+  }
+}
+
+@media (min-width: 75rem) {
+  :root {
+    --step-0: 1.125rem;
+    --step-1: 1.3125rem;
+    --step-2: 1.875rem;
+    --step-3: 2.625rem;
+    --step-4: 3.875rem;
+    --step-5: 5.25rem;
+  }
+}

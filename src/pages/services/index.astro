@@ -1,0 +1,609 @@
+---
+import guestImage from '@/assets/source/12-branding-4201.jpg';
+import restyleImage from '@/assets/source/11-branding-3632.jpg';
+import extensionsImage from '@/assets/source/13-branding-3015.jpg';
+import heroImage from '@/assets/source/02-branding-3944.jpg';
+import ButtonLink from '@/components/global/ButtonLink.astro';
+import ResponsiveImage from '@/components/content/ResponsiveImage.astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { processSteps } from '@/lib/content';
+import { getAddons, getPackages } from '@/lib/sanity/content';
+import { breadcrumbSchema, serviceSchema } from '@/lib/seo/schema';
+
+const title = "Bridal Hair Packages in Colorado | Em's Bridal Hair";
+const description =
+  'Compare bridal hairstyling packages, thoughtful add-ons, and the planning experience for Denver and Colorado weddings.';
+const siteUrl = import.meta.env.PUBLIC_SITE_URL || undefined;
+const [packages, addons] = await Promise.all([getPackages(), getAddons()]);
+const schemas = [serviceSchema(siteUrl)];
+
+if (siteUrl) {
+  schemas.push(
+    breadcrumbSchema([
+      { name: 'Home', url: siteUrl },
+      { name: 'Services', url: new URL('/services/', siteUrl).toString() },
+    ]),
+  );
+}
+
+const addonImages = [restyleImage, guestImage, extensionsImage];
+const addonAlts = [
+  'Emily refining a client hairstyle in her studio',
+  'Emily smiling while working with a client',
+  'Emily comparing two shades of clip-in hair extensions',
+];
+---
+
+<BaseLayout title={title} description={description} schema={schemas}>
+  <section class="service-hero">
+    <ResponsiveImage
+      src={heroImage}
+      alt="Emily shaping long waves during a bridal styling session"
+      widths={[640, 960, 1440, 1920]}
+      sizes="100vw"
+      loading="eager"
+      fetchpriority="high"
+      class="service-hero-image"
+    />
+    <div class="service-hero-shade" aria-hidden="true"></div>
+    <div class="service-hero-content">
+      <p class="eyebrow">Denver + Colorado</p>
+      <h1>Bridal hair services shaped around your morning.</h1>
+      <p>Romantic styling, clear planning, and enough room for the people beside you.</p>
+    </div>
+  </section>
+
+  <section class="fit section-shell">
+    <p class="eyebrow">The right fit</p>
+    <div>
+      <h2>For brides drawn to softness, movement, and a calm room.</h2>
+      <p>
+        The experience is designed around textured high updos, romantic half-up styles, and polished
+        waves that feel touchable without losing their shape.
+      </p>
+      <p>
+        You do not need every detail decided before you inquire. Bring the references you love, and
+        Emily will help translate them into a style that works with your hair, dress, and day.
+      </p>
+    </div>
+  </section>
+
+  <section class="package-section" aria-labelledby="package-heading">
+    <div class="section-shell">
+      <div class="package-intro">
+        <p class="eyebrow">Bridal packages</p>
+        <h2 id="package-heading" class="section-title">
+          Choose by the size of your morning.
+        </h2>
+        <p>
+          Published starting prices are shown below. Final timing, staffing, travel, and service
+          count are confirmed in your proposal.
+        </p>
+      </div>
+      <div class="package-comparison">
+        {packages.map((item, index) => (
+          <article class="package-row">
+            <div class="package-name">
+              <span>0{index + 1}</span>
+              <h3>{item.name}</h3>
+              <p>{item.summary}</p>
+            </div>
+            <div class="package-details">
+              <p>{item.partySize}</p>
+              <ul>
+                {item.features.map((feature) => (
+                  <li>{feature}</li>
+                ))}
+              </ul>
+            </div>
+            <p class="package-price">
+              <small>Starting at</small>
+              {item.price}
+            </p>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="addons section-shell" aria-labelledby="addons-heading">
+    <div class="addons-intro">
+      <p class="eyebrow">Make it yours</p>
+      <h2 id="addons-heading" class="section-title">
+        Thoughtful additions.
+      </h2>
+    </div>
+    <div class="addon-list">
+      {addons.map((addon, index) => (
+        <article class="addon">
+          <div class="addon-image">
+            <ResponsiveImage
+              src={addonImages[index]}
+              alt={addonAlts[index]}
+              widths={[480, 720, 960]}
+              sizes="(min-width: 48rem) 31vw, 100vw"
+            />
+          </div>
+          <div class="addon-copy">
+            <span>0{index + 1}</span>
+            <h3>{addon.name}</h3>
+            <p>{addon.description}</p>
+            <strong>{addon.price}</strong>
+          </div>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <section class="included" aria-labelledby="included-heading">
+    <div class="section-shell included-layout">
+      <div class="included-heading">
+        <p class="eyebrow">What is built in</p>
+        <h2 id="included-heading">The support behind the style.</h2>
+      </div>
+      <div class="included-list">
+        <article>
+          <h3>Your bridal preview</h3>
+          <p>
+            A dedicated appointment to explore your references and refine one cohesive direction
+            before the wedding day.
+          </p>
+        </article>
+        <article>
+          <h3>Timeline planning</h3>
+          <p>
+            A custom schedule considers party size, artist coverage, photography, and the time you
+            need to get dressed without rushing.
+          </p>
+        </article>
+        <article>
+          <h3>On-location styling</h3>
+          <p>
+            Emily serves Denver and weddings across Colorado. Travel and venue logistics are quoted
+            after your location is confirmed.
+          </p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="booking section-shell" aria-labelledby="booking-heading">
+    <div class="booking-intro">
+      <p class="eyebrow">From inquiry to aisle</p>
+      <h2 id="booking-heading" class="section-title">
+        A clear, collaborative process.
+      </h2>
+    </div>
+    <ol>
+      {processSteps.map((step) => (
+        <li>
+          <span>{step.number}</span>
+          <div>
+            <h3>{step.title}</h3>
+            <p>{step.body}</p>
+          </div>
+        </li>
+      ))}
+    </ol>
+  </section>
+
+  <section class="service-faq section-shell" aria-labelledby="faq-heading">
+    <div class="faq-intro">
+      <p class="eyebrow">Before you inquire</p>
+      <h2 id="faq-heading" class="section-title">
+        A few useful answers.
+      </h2>
+    </div>
+    <div class="faq-list">
+      <details>
+        <summary>Is a bridal preview included?</summary>
+        <p>
+          Yes. Each published bridal package includes a preview and a dedicated two-hour bridal
+          appointment on the wedding day.
+        </p>
+      </details>
+      <details>
+        <summary>Can I add another guest?</summary>
+        <p>
+          An additional hair service is currently listed at $200. Availability depends on the
+          package, timeline, and artist coverage, so it is confirmed in your proposal.
+        </p>
+      </details>
+      <details>
+        <summary>Do you travel outside Denver?</summary>
+        <p>
+          Yes. Weddings across Colorado are welcomed. Share your venue when you inquire so travel,
+          parking, and timing can be quoted accurately.
+        </p>
+      </details>
+      <details>
+        <summary>What if I am unsure about my style?</summary>
+        <p>
+          Bring the images and details you are drawn to. Emily will help identify the common threads
+          and shape a direction during your preview.
+        </p>
+      </details>
+    </div>
+  </section>
+
+  <section class="services-closing">
+    <p class="eyebrow">Ready when you are</p>
+    <h2>Start with the date, venue, and people you are bringing along.</h2>
+    <p>Your proposal will make the right package, timing, travel, and staffing clear.</p>
+    <ButtonLink href="/inquire/">Check availability</ButtonLink>
+  </section>
+</BaseLayout>
+
+<style>
+  .section-shell {
+    width: min(100%, calc(var(--layout-width) + 2 * var(--gutter)));
+    margin-inline: auto;
+    padding-inline: var(--gutter);
+  }
+
+  .service-hero {
+    position: relative;
+    display: grid;
+    min-height: 42rem;
+    align-items: end;
+    overflow: clip;
+    color: var(--color-surface);
+  }
+
+  .service-hero :global(.service-hero-image),
+  .service-hero-shade {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .service-hero :global(.service-hero-image) {
+    object-fit: cover;
+    object-position: 48% 36%;
+  }
+
+  .service-hero-shade {
+    background:
+      linear-gradient(180deg, rgb(46 31 24 / 0.42), transparent 36%),
+      linear-gradient(0deg, rgb(46 31 24 / 0.76), transparent 68%);
+  }
+
+  .service-hero-content {
+    position: relative;
+    z-index: 1;
+    width: min(56rem, 100%);
+    padding: 10rem var(--gutter) var(--space-7);
+  }
+
+  .service-hero .eyebrow {
+    color: var(--color-surface);
+  }
+
+  .service-hero h1 {
+    max-width: 15ch;
+    margin-bottom: var(--space-4);
+    font-size: 2.5rem;
+    line-height: 1.1;
+  }
+
+  .service-hero-content > p:last-child {
+    max-width: 38rem;
+    margin-bottom: 0;
+    font-size: var(--step-1);
+  }
+
+  .fit {
+    display: grid;
+    gap: var(--space-4);
+    padding-block: var(--space-7);
+  }
+
+  .fit h2 {
+    max-width: 21ch;
+    margin-bottom: var(--space-4);
+    color: var(--color-accent);
+    font-size: var(--step-4);
+  }
+
+  .fit div {
+    max-width: 46rem;
+  }
+
+  .package-section {
+    padding-block: var(--space-7);
+    background: var(--color-background-alt);
+  }
+
+  .package-intro {
+    max-width: 44rem;
+    margin-bottom: var(--space-6);
+  }
+
+  .package-intro .section-title {
+    color: var(--color-text);
+  }
+
+  .package-comparison {
+    border-top: 1px solid var(--color-border);
+  }
+
+  .package-row {
+    display: grid;
+    gap: 0;
+    padding-block: var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .package-name > span {
+    color: var(--color-text);
+    font-size: var(--step--1);
+  }
+
+  .package-name h3 {
+    margin-block: var(--space-2) var(--space-3);
+    font-size: var(--step-2);
+  }
+
+  .package-name p {
+    max-width: 32rem;
+    margin-bottom: 0;
+  }
+
+  .package-details {
+    order: 2;
+    margin-top: var(--space-5);
+  }
+
+  .package-details > p {
+    font-weight: 600;
+  }
+
+  .package-details ul {
+    margin: 0;
+    padding-left: 1.2rem;
+  }
+
+  .package-details li + li {
+    margin-top: var(--space-1);
+  }
+
+  .package-price {
+    order: 1;
+    margin: var(--space-4) 0 0;
+    color: var(--color-text);
+    font-size: var(--step-2);
+  }
+
+  .package-price small {
+    display: block;
+    color: var(--color-text);
+    font-size: var(--step--1);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .addons {
+    padding-block: var(--space-7);
+  }
+
+  .addons-intro {
+    margin-bottom: var(--space-5);
+  }
+
+  .addon-list {
+    display: grid;
+    gap: var(--space-5);
+  }
+
+  .addon {
+    display: grid;
+    grid-template-rows: auto 1fr;
+  }
+
+  .addon-image {
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+  }
+
+  .addon-image :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 28%;
+  }
+
+  .addon-copy {
+    padding-top: var(--space-3);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .addon-copy > span {
+    color: var(--color-text);
+    font-size: var(--step--1);
+  }
+
+  .addon-copy h3 {
+    margin-block: var(--space-2);
+    font-size: var(--step-1);
+  }
+
+  .addon-copy strong {
+    color: var(--color-text);
+    font-weight: 500;
+  }
+
+  .included {
+    padding-block: var(--space-7);
+    background: var(--color-sage);
+    color: var(--color-surface);
+  }
+
+  .included-layout {
+    display: grid;
+    gap: var(--space-6);
+  }
+
+  .included .eyebrow {
+    color: var(--color-surface);
+  }
+
+  .included h2 {
+    max-width: 18ch;
+    font-size: var(--step-4);
+  }
+
+  .included-list article {
+    padding-block: var(--space-4);
+    border-top: 1px solid color-mix(in srgb, var(--color-surface) 45%, transparent);
+  }
+
+  .included-list h3 {
+    margin-bottom: var(--space-2);
+    font-size: var(--step-1);
+  }
+
+  .included-list p {
+    margin: 0;
+  }
+
+  .booking {
+    display: grid;
+    gap: var(--space-6);
+    padding-block: var(--space-7);
+  }
+
+  .booking ol {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .booking li {
+    display: grid;
+    grid-template-columns: 2.5rem minmax(0, 1fr);
+    gap: var(--space-3);
+    padding-block: var(--space-4);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .booking li > span {
+    color: var(--color-text);
+    font-size: var(--step--1);
+  }
+
+  .booking h3 {
+    margin-bottom: var(--space-2);
+    font-size: var(--step-1);
+  }
+
+  .booking li p {
+    margin: 0;
+  }
+
+  .service-faq {
+    display: grid;
+    gap: var(--space-6);
+    padding-block: var(--space-7);
+  }
+
+  .faq-list {
+    border-top: 1px solid var(--color-border);
+  }
+
+  .faq-list details {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .faq-list summary {
+    min-height: 4.5rem;
+    padding: var(--space-3) 2.25rem var(--space-3) 0;
+    font-size: var(--step-1);
+    cursor: pointer;
+  }
+
+  .faq-list p {
+    max-width: 44rem;
+    padding: 0 var(--space-4) var(--space-4) 0;
+  }
+
+  .services-closing {
+    padding: var(--space-7) var(--gutter);
+    background: var(--color-background-soft);
+    text-align: center;
+  }
+
+  .services-closing h2 {
+    max-width: 23ch;
+    margin-inline: auto;
+    margin-bottom: var(--space-3);
+    color: var(--color-text);
+    font-size: var(--step-4);
+  }
+
+  .services-closing > p:not(.eyebrow) {
+    max-width: 40rem;
+    margin-inline: auto;
+    margin-bottom: var(--space-4);
+  }
+
+  @media (min-width: 48rem) {
+    .fit,
+    .included-layout,
+    .booking,
+    .service-faq {
+      grid-template-columns: minmax(0, 0.8fr) minmax(22rem, 1.2fr);
+      align-items: start;
+    }
+
+    .package-row {
+      grid-template-columns: minmax(0, 0.8fr) minmax(20rem, 1.2fr) 10rem;
+      gap: var(--space-4);
+      align-items: start;
+      padding-block: var(--space-5);
+    }
+
+    .package-details,
+    .package-price {
+      order: initial;
+      margin-top: 0;
+    }
+
+    .package-price {
+      text-align: right;
+    }
+
+    .addon-list {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      align-items: start;
+    }
+
+    .addon:nth-child(2) {
+      margin-top: var(--space-7);
+    }
+
+    .addon:nth-child(2) .addon-image {
+      aspect-ratio: 4 / 4.3;
+    }
+
+    .addon:nth-child(3) {
+      margin-top: var(--space-4);
+    }
+
+    .addon:nth-child(3) .addon-image {
+      aspect-ratio: 4 / 5.4;
+    }
+
+    .service-hero h1 {
+      max-width: 14ch;
+      font-size: var(--step-5);
+      line-height: 1.14;
+    }
+  }
+
+  @media (min-width: 80rem) {
+    .service-hero-content {
+      margin-left: max(0rem, calc((100vw - var(--wide-width)) / 2));
+    }
+  }
+</style>

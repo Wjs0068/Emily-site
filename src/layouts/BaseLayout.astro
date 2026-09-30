@@ -1,0 +1,90 @@
+---
+import Footer from '@/components/global/Footer.astro';
+import Header from '@/components/global/Header.astro';
+import { publicEnv } from '@/lib/env';
+import type { JsonLd } from '@/lib/seo/schema';
+import '@/styles/global.css';
+
+interface Props {
+  title: string;
+  description: string;
+  socialImage?: string;
+  ogType?: 'website' | 'article';
+  headerTheme?: 'overlay' | 'light';
+  schema?: JsonLd | JsonLd[];
+  robots?: string;
+}
+
+const {
+  title,
+  description,
+  socialImage,
+  ogType = 'website',
+  headerTheme = 'overlay',
+  schema,
+  robots,
+} = Astro.props;
+const siteUrl = publicEnv.PUBLIC_SITE_URL || undefined;
+const canonical = siteUrl ? new URL(Astro.url.pathname, siteUrl).toString() : undefined;
+const absoluteSocialImage =
+  socialImage && siteUrl ? new URL(socialImage, siteUrl).toString() : undefined;
+const schemas = schema ? (Array.isArray(schema) ? schema : [schema]) : [];
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="theme-color" content="#5c4033" />
+    <meta name="description" content={description} />
+    {robots && <meta name="robots" content={robots} />}
+    <title>{title}</title>
+    {canonical && <link rel="canonical" href={canonical} />}
+    <meta property="og:type" content={ogType} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    {canonical && <meta property="og:url" content={canonical} />}
+    {absoluteSocialImage && <meta property="og:image" content={absoluteSocialImage} />}
+    <meta name="twitter:card" content={absoluteSocialImage ? 'summary_large_image' : 'summary'} />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    {absoluteSocialImage && <meta name="twitter:image" content={absoluteSocialImage} />}
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    {publicEnv.PUBLIC_GA_MEASUREMENT_ID && (
+      <script
+        is:inline
+        async
+        src={`https://www.googletagmanager.com/gtag/js?id=${publicEnv.PUBLIC_GA_MEASUREMENT_ID}`}
+      ></script>
+    )}
+    {publicEnv.PUBLIC_GA_MEASUREMENT_ID && <script
+      is:inline
+      define:vars={{ measurementId: publicEnv.PUBLIC_GA_MEASUREMENT_ID }}
+    >
+      window.dataLayer = window.dataLayer || [];
+      window.gtag = function (...args) {
+        window.dataLayer.push(args);
+      };
+      window.gtag('js', new Date());
+      window.gtag('config', measurementId);
+    </script>}
+    {schemas.map((item) => (
+      <script
+        type="application/ld+json"
+        set:html={JSON.stringify(item).replaceAll('<', '\\u003c')}
+      />
+    ))}
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">
+      Skip to main content
+    </a>
+    <Header theme={headerTheme} />
+    <main id="main-content">
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>

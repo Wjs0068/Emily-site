@@ -1,0 +1,273 @@
+---
+import heroImage from '@/assets/source/13-branding-3015.jpg';
+import Breadcrumbs from '@/components/content/Breadcrumbs.astro';
+import ResponsiveImage from '@/components/content/ResponsiveImage.astro';
+import ButtonLink from '@/components/global/ButtonLink.astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { getFaqs } from '@/lib/sanity/content';
+import { breadcrumbSchema } from '@/lib/seo/schema';
+
+const title = "Bridal Hair FAQ | Denver & Colorado | Em's Bridal Hair";
+const description =
+  'Answers about booking, bridal hair services, previews, travel, pricing, and wedding-day planning in Denver and across Colorado.';
+const siteUrl = import.meta.env.PUBLIC_SITE_URL || undefined;
+const faqItems = await getFaqs();
+const categoryDefinitions = [
+  {
+    key: 'booking',
+    title: 'Booking',
+    introduction: 'Starting the conversation and reserving your wedding date.',
+  },
+  {
+    key: 'services',
+    title: 'Services & Pricing',
+    introduction: 'How collections, additions, and artist coverage are handled.',
+  },
+  {
+    key: 'preview',
+    title: 'Bridal Preview',
+    introduction: 'A focused appointment for shaping and refining your direction.',
+  },
+  {
+    key: 'travel',
+    title: 'Travel',
+    introduction: 'On-location service for Denver and celebrations across Colorado.',
+  },
+  {
+    key: 'weddingDay',
+    title: 'Wedding Day',
+    introduction: 'What supports a calm, well-paced morning.',
+  },
+] as const;
+const faqCategories = categoryDefinitions
+  .map((category) => ({
+    ...category,
+    items: faqItems.filter((item) => item.category === category.key),
+  }))
+  .filter((category) => category.items.length > 0);
+const schemas = siteUrl
+  ? [
+      breadcrumbSchema([
+        { name: 'Home', url: siteUrl },
+        { name: 'FAQ', url: new URL('/faq/', siteUrl).toString() },
+      ]),
+    ]
+  : [];
+---
+
+<BaseLayout title={title} description={description} headerTheme="light" schema={schemas}>
+  <section class="faq-hero">
+    <div class="faq-hero-image">
+      <ResponsiveImage
+        src={heroImage}
+        alt="Emily comparing shades of clip-in hair extensions"
+        widths={[640, 960, 1440]}
+        sizes="(min-width: 56rem) 47vw, 100vw"
+        loading="eager"
+        fetchpriority="high"
+      />
+    </div>
+    <div class="faq-hero-copy">
+      <Breadcrumbs items={[{ label: 'Home', href: '/' }, { label: 'FAQ' }]} />
+      <p class="eyebrow">Questions, answered</p>
+      <h1>Clarity before the first pin.</h1>
+      <p>
+        A thoughtful wedding morning starts with clear expectations. Find the practical details
+        here, then bring the specifics of your day to your inquiry.
+      </p>
+    </div>
+  </section>
+
+  <section class="faq-content section-shell" aria-label="Frequently asked questions">
+    {faqCategories.map((category, categoryIndex) => (
+      <section class="faq-group" aria-labelledby={`faq-group-${categoryIndex}`}>
+        <header>
+          <p class="group-number">0{categoryIndex + 1}</p>
+          <h2 id={`faq-group-${categoryIndex}`}>{category.title}</h2>
+          <p>{category.introduction}</p>
+        </header>
+        <div class="disclosures">
+          {category.items.map((item) => (
+            <details>
+              <summary>{item.question}</summary>
+              <p>{item.answer}</p>
+            </details>
+          ))}
+        </div>
+      </section>
+    ))}
+  </section>
+
+  <section class="faq-closing">
+    <div class="section-shell faq-closing-inner">
+      <p class="eyebrow">Still wondering?</p>
+      <h2>Your proposal is where the details become yours.</h2>
+      <p>
+        Share your date, getting-ready location, and service count so Emily can confirm travel,
+        timing, staffing, and investment for your wedding.
+      </p>
+      <ButtonLink href="/services/">Review services</ButtonLink>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .section-shell {
+    width: min(100%, calc(var(--layout-width) + 2 * var(--gutter)));
+    margin-inline: auto;
+    padding-inline: var(--gutter);
+  }
+
+  .faq-hero {
+    display: grid;
+    background: var(--color-background-alt);
+  }
+
+  .faq-hero-image {
+    min-height: 25rem;
+    overflow: hidden;
+  }
+
+  .faq-hero-image :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 28%;
+  }
+
+  .faq-hero-copy {
+    align-self: center;
+    padding: var(--space-6) var(--gutter) var(--space-7);
+  }
+
+  .faq-hero-copy :global(.breadcrumbs) {
+    margin-bottom: var(--space-6);
+  }
+
+  .faq-hero h1 {
+    max-width: 10ch;
+    margin-bottom: var(--space-4);
+    color: var(--color-text);
+    font-size: var(--step-5);
+  }
+
+  .faq-hero-copy > p:last-child {
+    max-width: 38rem;
+    margin: 0;
+    font-size: var(--step-1);
+  }
+
+  .faq-content {
+    padding-block: var(--space-7) var(--space-8);
+  }
+
+  .faq-group {
+    display: grid;
+    gap: var(--space-5);
+  }
+
+  .faq-group + .faq-group {
+    margin-top: var(--space-7);
+  }
+
+  .faq-group header {
+    max-width: 26rem;
+  }
+
+  .group-number {
+    margin-bottom: var(--space-3);
+    color: var(--color-text);
+    font-size: var(--step--1);
+  }
+
+  .faq-group h2 {
+    margin-bottom: var(--space-3);
+    color: var(--color-accent);
+    font-size: var(--step-3);
+  }
+
+  .disclosures {
+    border-top: 1px solid var(--color-border);
+  }
+
+  details {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  summary {
+    position: relative;
+    padding: var(--space-4) 3rem var(--space-4) 0;
+    font-family: var(--font-display);
+    font-size: var(--step-1);
+    line-height: 1.45;
+    cursor: pointer;
+    list-style: none;
+  }
+
+  summary::-webkit-details-marker {
+    display: none;
+  }
+
+  summary::after {
+    position: absolute;
+    top: 50%;
+    right: 0;
+    width: 1.75rem;
+    height: 1.75rem;
+    border: 1px solid currentColor;
+    content: '+';
+    font-size: 1.15rem;
+    line-height: 1.55rem;
+    text-align: center;
+    translate: 0 -50%;
+  }
+
+  details[open] summary::after {
+    content: '−';
+  }
+
+  details p {
+    max-width: 43rem;
+    padding: 0 var(--space-5) var(--space-5) 0;
+  }
+
+  .faq-closing {
+    padding-block: var(--space-7);
+    background: var(--color-sage);
+    color: var(--color-surface);
+  }
+
+  .faq-closing .eyebrow {
+    color: var(--color-surface);
+  }
+
+  .faq-closing-inner {
+    max-width: 62rem;
+  }
+
+  .faq-closing h2 {
+    max-width: 17ch;
+    margin-bottom: var(--space-4);
+    font-size: var(--step-4);
+  }
+
+  .faq-closing p:not(.eyebrow) {
+    max-width: 43rem;
+  }
+
+  @media (min-width: 48rem) {
+    .faq-hero {
+      grid-template-columns: 0.95fr 1.05fr;
+      min-height: 44rem;
+    }
+
+    .faq-hero-image {
+      min-height: 44rem;
+    }
+
+    .faq-group {
+      grid-template-columns: 0.7fr 1.3fr;
+      gap: var(--space-7);
+    }
+  }
+</style>

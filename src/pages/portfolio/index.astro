@@ -1,0 +1,288 @@
+---
+import stylingWaves from '@/assets/source/01-branding-3399.jpg';
+import stylingPortrait from '@/assets/source/02-branding-3944.jpg';
+import weddingParty from '@/assets/source/03-img-1190.jpg';
+import texturedUpdo from '@/assets/source/04-bride-015a0371.jpg';
+import softWaves from '@/assets/source/05-lauren.jpeg';
+import mountainBride from '@/assets/source/08-caley-wedding.jpg';
+import restyle from '@/assets/source/11-branding-3632.jpg';
+import guestStyling from '@/assets/source/12-branding-4201.jpg';
+import Breadcrumbs from '@/components/content/Breadcrumbs.astro';
+import ResponsiveImage from '@/components/content/ResponsiveImage.astro';
+import ButtonLink from '@/components/global/ButtonLink.astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { getGalleryItems } from '@/lib/sanity/content';
+import { breadcrumbSchema } from '@/lib/seo/schema';
+
+const title = "Colorado Bridal Hair Portfolio | Em's Bridal Hair";
+const description =
+  'Explore romantic updos, soft waves, and wedding-morning hairstyling created for brides and bridal parties in Denver and across Colorado.';
+const siteUrl = import.meta.env.PUBLIC_SITE_URL || undefined;
+const schemas = siteUrl
+  ? [
+      breadcrumbSchema([
+        { name: 'Home', url: siteUrl },
+        { name: 'Portfolio', url: new URL('/portfolio/', siteUrl).toString() },
+      ]),
+    ]
+  : [];
+
+const fallbackGalleryItems = [
+  {
+    image: stylingWaves,
+    alt: 'Emily shaping long, soft waves during a styling appointment',
+    styleCategory: 'Soft waves',
+    context: 'Styling in progress',
+  },
+  {
+    image: texturedUpdo,
+    alt: 'Textured bridal updo with loose face-framing pieces',
+    styleCategory: 'Textured updo',
+  },
+  {
+    image: weddingParty,
+    alt: 'Bride and wedding party gathered outdoors in the Colorado mountains',
+    styleCategory: 'Bridal party',
+    location: 'Colorado',
+  },
+  {
+    image: softWaves,
+    alt: 'Bride turning to show long, softly curled hair',
+    styleCategory: 'Soft waves',
+  },
+  {
+    image: stylingPortrait,
+    alt: 'Emily shaping polished waves with a curling iron',
+    styleCategory: 'Styling in progress',
+  },
+  {
+    image: mountainBride,
+    alt: 'Bride wearing a loose updo and holding a bouquet outdoors',
+    styleCategory: 'Loose updo',
+    location: 'Colorado',
+  },
+  {
+    image: restyle,
+    alt: 'Emily refining a client hairstyle from behind',
+    styleCategory: 'Finishing details',
+  },
+  {
+    image: guestStyling,
+    alt: 'Emily smiling while styling a client in her chair',
+    styleCategory: 'Wedding morning',
+  },
+];
+const sanityGalleryItems = await getGalleryItems();
+const galleryItems =
+  sanityGalleryItems.length > 0
+    ? sanityGalleryItems.map((item) => ({
+        image: item.image.url,
+        width: item.image.width,
+        height: item.image.height,
+        alt: item.image.alt,
+        styleCategory: item.styleCategory,
+        context: item.caption,
+        location: item.location,
+      }))
+    : fallbackGalleryItems;
+---
+
+<BaseLayout title={title} description={description} headerTheme="light" schema={schemas}>
+  <section class="portfolio-heading section-shell">
+    <Breadcrumbs items={[{ label: 'Home', href: '/' }, { label: 'Portfolio' }]} />
+    <p class="eyebrow">Selected work</p>
+    <h1>Romantic shape. Soft movement. Made to hold.</h1>
+    <p>
+      A lookbook of bridal hair, finishing details, and wedding mornings in Denver and across
+      Colorado.
+    </p>
+  </section>
+
+  <section class="lookbook section-shell" aria-label="Bridal hair portfolio">
+    {galleryItems.map((item, index) => (
+      <figure class={`lookbook-item lookbook-item--${index + 1}`}>
+        <div class="lookbook-image">
+          <ResponsiveImage
+            src={item.image}
+            alt={item.alt}
+            width={'width' in item ? item.width : undefined}
+            height={'height' in item ? item.height : undefined}
+            widths={[480, 720, 960, 1280]}
+            sizes="(min-width: 64rem) 44vw, (min-width: 48rem) 52vw, 100vw"
+            loading={index === 0 ? 'eager' : 'lazy'}
+            fetchpriority={index === 0 ? 'high' : 'auto'}
+          />
+        </div>
+        <figcaption>
+          <span>{item.styleCategory}</span>
+          {(item.context || item.location) && <span>{item.context || item.location}</span>}
+        </figcaption>
+      </figure>
+    ))}
+  </section>
+
+  <section class="portfolio-note">
+    <div class="section-shell portfolio-note-inner">
+      <p class="eyebrow">Your own direction</p>
+      <h2>Bring the references. Keep what feels like you.</h2>
+      <p>
+        Emily will help translate the texture, balance, and details you love into a style suited to
+        your hair and your day.
+      </p>
+      <ButtonLink href="/services/">Explore bridal services</ButtonLink>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .section-shell {
+    width: min(100%, calc(var(--wide-width) + 2 * var(--gutter)));
+    margin-inline: auto;
+    padding-inline: var(--gutter);
+  }
+
+  .portfolio-heading {
+    padding-block: var(--space-6) var(--space-7);
+  }
+
+  .portfolio-heading :global(.breadcrumbs) {
+    margin-bottom: var(--space-7);
+  }
+
+  .portfolio-heading h1 {
+    max-width: 13ch;
+    margin-bottom: var(--space-4);
+    color: var(--color-accent);
+    font-size: var(--step-5);
+  }
+
+  .portfolio-heading > p:last-child {
+    max-width: 43rem;
+    margin: 0;
+    font-size: var(--step-1);
+  }
+
+  .lookbook {
+    display: grid;
+    gap: var(--space-7) var(--space-6);
+    padding-bottom: var(--space-8);
+  }
+
+  .lookbook-item {
+    margin: 0;
+  }
+
+  .lookbook-image {
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+  }
+
+  .lookbook-image :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .lookbook-item--1 .lookbook-image,
+  .lookbook-item--3 .lookbook-image {
+    aspect-ratio: 5 / 4;
+  }
+
+  .lookbook-item--1 :global(img) {
+    object-position: 53% center;
+  }
+
+  .lookbook-item--3 :global(img) {
+    object-position: center 72%;
+  }
+
+  .lookbook-item--5 .lookbook-image,
+  .lookbook-item--7 .lookbook-image {
+    aspect-ratio: 3 / 4;
+  }
+
+  .lookbook-item--7 :global(img) {
+    object-position: 48% center;
+  }
+
+  figcaption {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding-top: var(--space-3);
+    color: var(--color-text);
+    font-size: var(--step--1);
+  }
+
+  figcaption span:first-child {
+    color: var(--color-text);
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  .portfolio-note {
+    padding-block: var(--space-7);
+    background: var(--color-sage);
+    color: var(--color-surface);
+  }
+
+  .portfolio-note .eyebrow {
+    color: var(--color-surface);
+  }
+
+  .portfolio-note-inner {
+    max-width: 62rem;
+  }
+
+  .portfolio-note h2 {
+    max-width: 17ch;
+    margin-bottom: var(--space-4);
+    font-size: var(--step-4);
+  }
+
+  .portfolio-note p:not(.eyebrow) {
+    max-width: 42rem;
+  }
+
+  @media (min-width: 48rem) {
+    .lookbook {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      align-items: start;
+    }
+
+    .lookbook-item--1 {
+      grid-column: 1 / 9;
+    }
+
+    .lookbook-item--2 {
+      grid-column: 9 / 13;
+      margin-top: var(--space-8);
+    }
+
+    .lookbook-item--3 {
+      grid-column: 4 / 13;
+    }
+
+    .lookbook-item--4 {
+      grid-column: 1 / 6;
+      margin-top: var(--space-7);
+    }
+
+    .lookbook-item--5 {
+      grid-column: 7 / 12;
+    }
+
+    .lookbook-item--6 {
+      grid-column: 2 / 8;
+    }
+
+    .lookbook-item--7 {
+      grid-column: 9 / 13;
+      margin-top: var(--space-8);
+    }
+
+    .lookbook-item--8 {
+      grid-column: 4 / 11;
+    }
+  }
+</style>

@@ -1,0 +1,93 @@
+---
+import ButtonLink from './ButtonLink.astro';
+import { publicEnv } from '@/lib/env';
+---
+
+<footer class="site-footer">
+  <div class="footer-intro">
+    <p class="eyebrow">Denver, Colorado</p>
+    <p class="footer-brand">Em's Bridal Hair</p>
+    <p>Romantic, effortless styling for calm wedding mornings across Colorado.</p>
+  </div>
+  <div class="footer-action">
+    <p>Planning your wedding hair?</p>
+    <ButtonLink href="/inquire/" variant="outline">
+      Start your inquiry
+    </ButtonLink>
+  </div>
+  <div class="footer-meta">
+    <p>&copy; {new Date().getFullYear()} Em's Bridal Hair</p>
+    <nav aria-label="Footer">
+      <a href="/services/">Services</a>
+      {publicEnv.PUBLIC_PRIVACY_POLICY_URL && (
+        <a href={publicEnv.PUBLIC_PRIVACY_POLICY_URL}>Privacy</a>
+      )}
+    </nav>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    display: grid;
+    gap: var(--space-6);
+    padding: var(--space-7) var(--gutter) var(--space-5);
+    background: var(--color-text);
+    color: var(--color-on-dark);
+  }
+
+  .footer-brand {
+    margin-bottom: var(--space-3);
+    font-size: var(--step-3);
+    line-height: 1.15;
+  }
+
+  .footer-intro > p:last-child {
+    max-width: 34rem;
+    margin-bottom: 0;
+  }
+
+  .site-footer .eyebrow {
+    color: var(--color-surface);
+  }
+
+  .footer-action p {
+    margin-bottom: var(--space-3);
+    font-size: var(--step-1);
+  }
+
+  .footer-action :global(.button-link--outline) {
+    border-color: var(--color-on-dark);
+    color: var(--color-on-dark);
+  }
+
+  .footer-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3) var(--space-5);
+    align-items: center;
+    justify-content: space-between;
+    border-top: 1px solid color-mix(in srgb, var(--color-on-dark) 35%, transparent);
+    padding-top: var(--space-4);
+    font-size: var(--step--1);
+  }
+
+  .footer-meta p {
+    margin: 0;
+  }
+
+  .footer-meta nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+  }
+
+  @media (min-width: 48rem) {
+    .site-footer {
+      grid-template-columns: minmax(0, 1.4fr) minmax(17rem, 0.6fr);
+    }
+
+    .footer-meta {
+      grid-column: 1 / -1;
+    }
+  }
+</style>

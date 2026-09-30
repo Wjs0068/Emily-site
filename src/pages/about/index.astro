@@ -1,0 +1,338 @@
+---
+import planningImage from '@/assets/source/06-branding-2805.jpg';
+import toolsImage from '@/assets/source/07-branding-3577.jpg';
+import stylingImage from '@/assets/source/01-branding-3399.jpg';
+import emilyPortrait from '@/assets/source/10-branding-3255.jpg';
+import Breadcrumbs from '@/components/content/Breadcrumbs.astro';
+import ResponsiveImage from '@/components/content/ResponsiveImage.astro';
+import ButtonLink from '@/components/global/ButtonLink.astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { breadcrumbSchema } from '@/lib/seo/schema';
+
+const title = "About Emily | Denver Bridal Hairstylist | Em's Bridal Hair";
+const description =
+  'Meet Emily, a Denver bridal hairstylist bringing years of team, education, and cosmetology experience to calm Colorado wedding mornings.';
+const siteUrl = import.meta.env.PUBLIC_SITE_URL || undefined;
+const schemas = siteUrl
+  ? [
+      breadcrumbSchema([
+        { name: 'Home', url: siteUrl },
+        { name: 'About', url: new URL('/about/', siteUrl).toString() },
+      ]),
+    ]
+  : [];
+---
+
+<BaseLayout title={title} description={description} headerTheme="light" schema={schemas}>
+  <section class="about-hero section-shell">
+    <div class="about-heading">
+      <Breadcrumbs items={[{ label: 'Home', href: '/' }, { label: 'About' }]} />
+      <p class="eyebrow">Meet Emily</p>
+      <h1>Hair has always been how I make people feel seen.</h1>
+      <p>
+        I am a Denver-based bridal hairstylist drawn to romance, movement, and wedding mornings
+        where everyone has room to breathe.
+      </p>
+    </div>
+    <div class="about-portrait">
+      <ResponsiveImage
+        src={emilyPortrait}
+        alt="Emily, the hairstylist behind Em's Bridal Hair"
+        widths={[640, 960, 1280]}
+        sizes="(min-width: 56rem) 50vw, 100vw"
+        loading="eager"
+        fetchpriority="high"
+      />
+    </div>
+  </section>
+
+  <section class="story section-shell" aria-labelledby="story-heading">
+    <p class="eyebrow">The beginning</p>
+    <div class="story-copy">
+      <h2 id="story-heading">The pull toward this work started early.</h2>
+      <p>
+        I fell in love with hair around thirteen and began pursuing the craft at seventeen. That
+        early curiosity led me to cosmetology school, then into the pace and possibility of bridal
+        beauty.
+      </p>
+      <p>
+        For five years, I worked with a large bridal hair and makeup team in Dallas. I learned how
+        much quiet preparation sits behind an effortless morning: reading the room, keeping a
+        timeline moving, and making each person feel cared for without making the experience feel
+        hurried.
+      </p>
+    </div>
+  </section>
+
+  <section class="statement" aria-labelledby="statement-heading">
+    <div class="statement-image">
+      <ResponsiveImage
+        src={planningImage}
+        alt="Emily reviewing wedding details at her laptop"
+        widths={[640, 960, 1440]}
+        sizes="(min-width: 56rem) 52vw, 100vw"
+      />
+    </div>
+    <div class="statement-copy">
+      <p class="eyebrow">What stayed with me</p>
+      <h2 id="statement-heading">The best work feels collaborative from the first message.</h2>
+      <p>
+        Later, working as a bridal educator deepened the way I communicate technique and choices.
+        Today, that same clarity helps my brides understand what will support their hair, their
+        references, and the feeling they want to carry into the day.
+      </p>
+    </div>
+  </section>
+
+  <section class="colorado section-shell" aria-labelledby="colorado-heading">
+    <div class="colorado-copy">
+      <p class="eyebrow">Now in Colorado</p>
+      <h2 id="colorado-heading">Romantic texture, grounded by a steady plan.</h2>
+      <p>
+        I specialize in bridal hair in Denver and across Colorado, especially textured high updos,
+        soft half-up styles, and polished waves. The finished style matters deeply. So does the way
+        we arrive there together.
+      </p>
+      <p>
+        You can expect honest guidance, space to change your mind, and a calm chair to come back to
+        while the room moves around you.
+      </p>
+      <ButtonLink href="/portfolio/" variant="text">
+        Explore the portfolio
+      </ButtonLink>
+    </div>
+    <div class="colorado-images">
+      <figure class="colorado-image colorado-image--styling">
+        <ResponsiveImage
+          src={stylingImage}
+          alt="Emily shaping a client's long bridal hairstyle"
+          widths={[480, 720, 960]}
+          sizes="(min-width: 56rem) 30vw, 74vw"
+        />
+      </figure>
+      <figure class="colorado-image colorado-image--tools">
+        <ResponsiveImage
+          src={toolsImage}
+          alt="Emily reaching into her professional hairstyling kit"
+          widths={[480, 720, 960]}
+          sizes="(min-width: 56rem) 24vw, 65vw"
+        />
+      </figure>
+    </div>
+  </section>
+
+  <section class="personal">
+    <div class="section-shell personal-inner">
+      <p class="eyebrow">Beyond the chair</p>
+      <h2>A boy mom, a French fry devotee, and happiest somewhere dreaming about romance.</h2>
+      <p>
+        The personal and professional parts of my life share the same thread: I care about people,
+        the details they remember, and beauty that never feels too precious to enjoy.
+      </p>
+      <ButtonLink href="/services/" variant="outline">
+        See the experience
+      </ButtonLink>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .section-shell {
+    width: min(100%, calc(var(--layout-width) + 2 * var(--gutter)));
+    margin-inline: auto;
+    padding-inline: var(--gutter);
+  }
+
+  .about-hero {
+    display: grid;
+    gap: var(--space-6);
+    padding-block: var(--space-6) var(--space-7);
+  }
+
+  .about-heading {
+    align-self: center;
+  }
+
+  .about-heading :global(.breadcrumbs) {
+    margin-bottom: var(--space-6);
+  }
+
+  .about-heading h1 {
+    max-width: 12ch;
+    margin-bottom: var(--space-4);
+    color: var(--color-accent);
+    font-size: var(--step-5);
+  }
+
+  .about-heading > p:last-child {
+    max-width: 36rem;
+    margin: 0;
+    font-size: var(--step-1);
+  }
+
+  .about-portrait {
+    min-height: 31rem;
+    overflow: hidden;
+  }
+
+  .about-portrait :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 28%;
+  }
+
+  .story {
+    display: grid;
+    gap: var(--space-4);
+    padding-block: var(--space-7);
+  }
+
+  .story-copy {
+    max-width: 47rem;
+  }
+
+  .story h2,
+  .colorado h2 {
+    margin-bottom: var(--space-5);
+    color: var(--color-accent);
+    font-size: var(--step-4);
+  }
+
+  .story p:not(.eyebrow),
+  .colorado-copy > p:not(.eyebrow) {
+    font-size: var(--step-1);
+  }
+
+  .statement {
+    display: grid;
+    background: var(--color-sage);
+    color: var(--color-surface);
+  }
+
+  .statement-image {
+    min-height: 24rem;
+  }
+
+  .statement-image :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 64% center;
+  }
+
+  .statement-copy {
+    align-self: center;
+    padding: var(--space-7) var(--gutter);
+  }
+
+  .statement .eyebrow {
+    color: var(--color-surface);
+  }
+
+  .statement h2 {
+    max-width: 16ch;
+    margin-bottom: var(--space-5);
+    font-size: var(--step-4);
+  }
+
+  .statement-copy > p:last-child {
+    max-width: 37rem;
+    margin: 0;
+  }
+
+  .colorado {
+    display: grid;
+    gap: var(--space-6);
+    padding-block: var(--space-7) var(--space-8);
+  }
+
+  .colorado-copy {
+    max-width: 44rem;
+  }
+
+  .colorado-images {
+    position: relative;
+    min-height: 37rem;
+  }
+
+  .colorado-image {
+    position: absolute;
+    margin: 0;
+    overflow: hidden;
+  }
+
+  .colorado-image :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .colorado-image--styling {
+    inset: 0 14% 12% 0;
+  }
+
+  .colorado-image--styling :global(img) {
+    object-position: 56% center;
+  }
+
+  .colorado-image--tools {
+    right: 0;
+    bottom: 0;
+    width: 48%;
+    height: 42%;
+    border: var(--space-2) solid var(--color-background);
+  }
+
+  .colorado-image--tools :global(img) {
+    object-position: 70% 78%;
+  }
+
+  .personal {
+    padding-block: var(--space-7);
+    background: var(--color-background-alt);
+    text-align: center;
+  }
+
+  .personal-inner {
+    max-width: 58rem;
+  }
+
+  .personal h2 {
+    margin-bottom: var(--space-4);
+    font-size: var(--step-3);
+  }
+
+  .personal p:not(.eyebrow) {
+    max-width: 44rem;
+    margin-inline: auto;
+  }
+
+  @media (min-width: 48rem) {
+    .about-hero {
+      grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+      min-height: 48rem;
+    }
+
+    .story {
+      grid-template-columns: 0.55fr 1fr;
+    }
+
+    .statement {
+      grid-template-columns: 1.08fr 0.92fr;
+    }
+
+    .statement-image {
+      min-height: 43rem;
+    }
+
+    .colorado {
+      grid-template-columns: 0.85fr 1.15fr;
+      align-items: center;
+    }
+
+    .colorado-images {
+      min-height: 45rem;
+    }
+  }
+</style>
