@@ -8,15 +8,23 @@ Sanity documents use one of three internal statuses: `OWNER_APPROVED`, `DEVELOPM
 
 ## HoneyBook
 
-Set these build variables after Emily confirms HoneyBook remains the CRM:
+The live Wix inquiry page embeds Emily's published HoneyBook contact form. Browser inspection found Wix's outer `filesusr.com` iframe, HoneyBook placement `632a07d8b2f1e1000827a1ea`, contact form `69686ba711cbe2002a8d7598`, and this public HoneyBook frame endpoint:
+
+```text
+https://public.honeybook.com/public_contact_form_app/07c4a1d/index.html
+```
+
+That endpoint renders the form only when HoneyBook's placement loader provides the public form configuration. Opening it directly or placing it in a bare iframe renders a blank page. The Astro component uses HoneyBook's published loader and placement on `/inquire/`; it does not copy Wix's wrapper. Set these build variables in the deployment environment:
 
 ```dotenv
 INQUIRY_PROVIDER=honeybook
-PUBLIC_HONEYBOOK_FORM_URL=https://approved-public-form-url.example
+PUBLIC_HONEYBOOK_FORM_URL=https://public.honeybook.com/public_contact_form_app/07c4a1d/index.html
 PUBLIC_CONTACT_EMAIL=optional-public-fallback@example.com
 ```
 
-The HoneyBook iframe exists only in the `/inquire/` page component and uses native lazy loading with reserved height. A direct form link and optional public email are provided if the embed fails. The iframe is cross-origin, so its internal labels, focus behavior, validation, error states, and successful-submit state cannot be audited or reliably detected by this site. The HoneyBook form owner must verify those details in HoneyBook.
+The URL is public, not a credential. The form is only loaded on `/inquire/`, with reserved height. The fallback currently opens the live Wix inquiry page; the Wix embed did not expose a verified standalone link for this contact form. Emily can replace that fallback by copying the direct link from the same contact form in HoneyBook (`Publish` → copy link). A separate lead-form link appeared in HoneyBook's public configuration, but returned a 404 and is not this Wix-embedded contact form.
+
+The iframe is cross-origin, so this site cannot change its internal labels, focus behavior, validation, error states, or detect a successful submission. Axe found serious or critical issues inside HoneyBook's own frame: invalid `autocomplete="nope"`, low-contrast helper text, and an unlabeled select input. The site-level axe test excludes the provider iframe, while the live-load test verifies its fields. Emily should review the provider form's accessibility in HoneyBook or with HoneyBook support.
 
 ## Privacy policy
 

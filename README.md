@@ -24,12 +24,12 @@ To enable Sanity, set these values in `.env`:
 PUBLIC_SITE_URL=https://example.com
 PUBLIC_SANITY_PROJECT_ID=your-project-id
 PUBLIC_SANITY_DATASET=production
-PUBLIC_HONEYBOOK_FORM_URL=
+PUBLIC_HONEYBOOK_FORM_URL=https://public.honeybook.com/public_contact_form_app/07c4a1d/index.html
 PUBLIC_CONTACT_EMAIL=
 PUBLIC_GA_MEASUREMENT_ID=
 PUBLIC_SHOW_JOURNAL=false
 CONTENT_MODE=development
-INQUIRY_PROVIDER=unconfirmed
+INQUIRY_PROVIDER=honeybook
 PRIVACY_POLICY_STATUS=DRAFT
 SANITY_STUDIO_PROJECT_ID=your-project-id
 SANITY_STUDIO_DATASET=production

@@ -1,77 +1,50 @@
 ---
 interface Props {
   formUrl?: string;
+  fallbackUrl?: string;
   fallbackEmail?: string;
   privacyUrl?: string;
 }
 
-const { formUrl, fallbackEmail, privacyUrl } = Astro.props;
+const { formUrl, fallbackUrl, fallbackEmail, privacyUrl } = Astro.props;
 ---
 
-<div class="inquiry-provider" data-inquiry-provider>
+<div class="inquiry-provider" data-inquiry-provider data-form-url={formUrl}>
   {formUrl ? (
-    <>
-      <div class="embed-shell" data-embed-shell aria-busy="true">
-        <p class="loading-state" data-loading-state role="status">
-          Loading the secure inquiry form…
-        </p>
-        <iframe
-          src={formUrl}
-          title="Wedding hair inquiry form"
-          loading="lazy"
-          referrerpolicy="strict-origin-when-cross-origin"
-          data-honeybook-frame
-        ></iframe>
-      </div>
-      <div class="form-fallback">
-        <p>
-          If the embedded form does not load,{' '}
-          <a href={formUrl} target="_blank" rel="noreferrer" data-inquiry-link>
-            open the secure form in a new window
-          </a>
-          .
-        </p>
-        {fallbackEmail && (
-          <p>
-            You can also email <a href={`mailto:${fallbackEmail}`}>{fallbackEmail}</a>.
-          </p>
-        )}
-      </div>
-      <p class="privacy-note">
-        The form is provided by HoneyBook. Information entered inside it is handled under
-        HoneyBook's privacy and accessibility practices; some browser and assistive-technology
-        behavior is outside this site's control.{' '}
-        {privacyUrl && <a href={privacyUrl}>Read this site's privacy policy.</a>}
+    <div class="embed-shell" data-embed-shell aria-busy="true">
+      <p class="loading-state" data-loading-state role="status">
+        Loading the secure inquiry form…
       </p>
-    </>
+      <div class="hb-p-632a07d8b2f1e1000827a1ea-1" data-honeybook-mount></div>
+    </div>
   ) : (
-    <section class="development-placeholder" aria-labelledby="form-setup-title">
-      <p class="eyebrow">Development integration placeholder</p>
-      <h3 id="form-setup-title">The owner-approved HoneyBook form is not configured yet.</h3>
-      <p>
-        Set <code>INQUIRY_PROVIDER=honeybook</code> and provide the approved public embed or form
-        URL as <code>PUBLIC_HONEYBOOK_FORM_URL</code>. No account ID or private credential belongs
-        in source control.
-      </p>
-      <p>The HoneyBook form should be configured to collect:</p>
-      <ul>
-        <li>Name, email, and phone</li>
-        <li>Wedding date, venue, and getting-ready location</li>
-        <li>Number of people needing hair</li>
-        <li>Desired style and how certain the bride feels</li>
-        <li>Extension interest</li>
-        <li>Instagram handle and referral source</li>
-        <li>Wedding details and notes</li>
-        <li>Budget or investment qualification, if enabled in HoneyBook</li>
-        <li>Text-message consent, if HoneyBook controls that consent</li>
-      </ul>
-    </section>
+    <p role="status">The embedded inquiry form is temporarily unavailable.</p>
   )}
+  <div class="form-fallback">
+    {fallbackUrl && (
+      <p>
+        If the embedded form does not load,{' '}
+        <a href={fallbackUrl} target="_blank" rel="noreferrer" data-inquiry-link>
+          open the inquiry form
+        </a>{' '}
+        on Emily's current site.
+      </p>
+    )}
+    {fallbackEmail && (
+      <p>
+        You can also email <a href={`mailto:${fallbackEmail}`}>{fallbackEmail}</a>.
+      </p>
+    )}
+  </div>
+  <p class="privacy-note">
+    The form is provided by HoneyBook. Information entered inside it is handled under HoneyBook's
+    privacy and accessibility practices; some browser and assistive-technology behavior is outside
+    this site's control. {privacyUrl && <a href={privacyUrl}>Read this site's privacy policy.</a>}
+  </p>
 </div>
 
 <script>
   const provider = document.querySelector<HTMLElement>('[data-inquiry-provider]');
-  const frame = provider?.querySelector<HTMLIFrameElement>('[data-honeybook-frame]');
   const shell = provider?.querySelector<HTMLElement>('[data-embed-shell]');
   const loadingState = provider?.querySelector<HTMLElement>('[data-loading-state]');
 
@@ -81,31 +54,60 @@ const { formUrl, fallbackEmail, privacyUrl } = Astro.props;
     window.gtag?.('event', 'inquiry_start');
   };
 
-  frame?.addEventListener('load', () => {
+  const connectFrame = (frame: HTMLIFrameElement) => {
+    if (frame.dataset.honeybookFrame === 'true') return;
+    frame.dataset.honeybookFrame = 'true';
+    frame.title = 'Wedding hair inquiry form';
+    frame.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
     shell?.setAttribute('aria-busy', 'false');
     loadingState?.setAttribute('hidden', '');
+
+    window.addEventListener('blur', () => {
+      if (document.activeElement === frame) trackStart();
+    });
+  };
+
+  const observer = new MutationObserver(() => {
+    const frame = provider?.querySelector<HTMLIFrameElement>('[data-honeybook-mount] iframe');
+    if (frame) {
+      connectFrame(frame);
+      observer.disconnect();
+    }
   });
+
+  if (provider?.dataset.formUrl && shell) {
+    observer.observe(shell, { childList: true, subtree: true });
+    window._HB_ = window._HB_ || {};
+    window._HB_.pid = '632a07d8b2f1e1000827a1ea';
+
+    const script = document.createElement('script');
+    script.src =
+      'https://widget.honeybook.com/assets_users_production/websiteplacements/placement-controller.min.js';
+    script.async = true;
+    script.addEventListener('error', () => shell.setAttribute('aria-busy', 'false'));
+    document.head.append(script);
+  }
 
   document.querySelectorAll<HTMLElement>('[data-inquiry-link]').forEach((link) => {
     link.addEventListener('click', trackStart, { once: true });
-  });
-
-  window.addEventListener('blur', () => {
-    if (document.activeElement === frame) trackStart();
   });
 </script>
 
 <style>
   .embed-shell {
     position: relative;
-    min-height: 62rem;
+    min-height: 99rem;
     background: var(--color-surface);
   }
 
-  iframe {
+  [data-honeybook-mount] {
+    width: 100%;
+  }
+
+  [data-honeybook-mount] :global(iframe) {
     display: block;
     width: 100%;
-    min-height: 62rem;
+    max-width: 100%;
     border: 0;
     background: var(--color-surface);
   }
@@ -127,36 +129,4 @@ const { formUrl, fallbackEmail, privacyUrl } = Astro.props;
   .form-fallback p {
     margin-bottom: var(--space-2);
   }
-
-  .development-placeholder {
-    padding-block: var(--space-5);
-    border-block: 1px solid var(--color-border);
-  }
-
-  .development-placeholder h3 {
-    max-width: 26ch;
-    margin-bottom: var(--space-3);
-    font-size: var(--step-2);
-  }
-
-  .development-placeholder p,
-  .development-placeholder ul {
-    max-width: 50rem;
-  }
-
-  code {
-    font-family: ui-monospace, monospace;
-    font-size: 0.9em;
-  }
-
-  @media (min-width: 48rem) {
-    .embed-shell,
-    iframe {
-      min-height: 70rem;
-    }
-  }
 </style>
-
-<script is:inline>
-  window.gtag = window.gtag || undefined;
-</script>

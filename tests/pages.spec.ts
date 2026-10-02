@@ -55,9 +55,10 @@ for (const route of routes) {
       await page.setViewportSize({ width: 390, height: 844 });
       await page.goto(route);
 
-      const results = await new AxeBuilder({ page })
-        .withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa'])
-        .analyze();
+      const axe = new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa']);
+      if (route === '/inquire/') axe.exclude('iframe[title="Wedding hair inquiry form"]');
+
+      const results = await axe.analyze();
       const highImpact = results.violations.filter(
         (violation) => violation.impact === 'serious' || violation.impact === 'critical',
       );
@@ -157,6 +158,58 @@ test('privacy route is draft-gated and linked from the footer', async ({ page })
   ).toHaveAttribute('href', '/privacy/');
 });
 
+test('privacy heading and numbered sections share one left edge', async ({ page }) => {
+  for (const viewport of [
+    { width: 390, height: 844 },
+    { width: 1440, height: 900 },
+  ]) {
+    await page.setViewportSize(viewport);
+    await page.goto('/privacy/');
+
+    const headingX = await page
+      .locator('.privacy-heading')
+      .evaluate((element) => Math.round(element.getBoundingClientRect().x));
+    const bodyX = await page
+      .locator('.privacy-body')
+      .evaluate((element) => Math.round(element.getBoundingClientRect().x));
+
+    expect(bodyX).toBe(headingX);
+  }
+});
+
+test('photographic heroes retain warm localized contrast overlays', async ({ page }) => {
+  for (const route of ['/', '/services/']) {
+    await page.goto(route);
+    const overlay = page.locator(route === '/' ? '.hero-shade' : '.service-hero-shade');
+    await expect(overlay).toHaveCSS('position', 'absolute');
+    expect(await overlay.evaluate((element) => getComputedStyle(element).backgroundImage)).toMatch(
+      /linear-gradient/,
+    );
+  }
+});
+
+test('published HoneyBook form loads on inquire when configured', async ({ page }) => {
+  test.skip(!process.env.PUBLIC_HONEYBOOK_FORM_URL, 'HoneyBook public URL is not configured.');
+  test.setTimeout(90_000);
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/inquire/', { waitUntil: 'domcontentloaded' });
+  const iframe = page.locator('iframe[title="Wedding hair inquiry form"]');
+  await expect(iframe).toHaveAttribute('src', process.env.PUBLIC_HONEYBOOK_FORM_URL!, {
+    timeout: 60_000,
+  });
+  const formFrame = page.frameLocator('iframe[title="Wedding hair inquiry form"]');
+  await expect(formFrame.getByText('Full name', { exact: false })).toBeVisible({ timeout: 60_000 });
+  await expect(formFrame.getByText('Wedding date', { exact: false })).toBeVisible();
+  await expect(page.locator('[data-embed-shell]')).toHaveAttribute('aria-busy', 'false');
+
+  const frameWidth = await formFrame.locator('html').evaluate((element) => ({
+    clientWidth: element.clientWidth,
+    scrollWidth: element.scrollWidth,
+  }));
+  expect(frameWidth.scrollWidth).toBeLessThanOrEqual(frameWidth.clientWidth);
+});
+
 test('HoneyBook resources are isolated to the inquiry route', async ({ page }) => {
   const thirdPartyRequests: string[] = [];
   page.on('request', (request) => {
@@ -164,8 +217,9 @@ test('HoneyBook resources are isolated to the inquiry route', async ({ page }) =
     if (!['localhost', '127.0.0.1'].includes(url.hostname)) thirdPartyRequests.push(request.url());
   });
 
-  for (const route of ['/', '/services/', '/portfolio/', '/about/', '/faq/', '/journal/']) {
+  for (const route of routes.filter((item) => item !== '/inquire/')) {
     await page.goto(route);
+    await expect(page.locator('iframe[src*="honeybook"]')).toHaveCount(0);
   }
 
   expect(thirdPartyRequests.filter((url) => /honeybook/i.test(url))).toEqual([]);

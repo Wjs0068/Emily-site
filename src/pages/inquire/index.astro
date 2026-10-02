@@ -151,6 +151,7 @@ if (siteUrl) {
       </header>
       <HoneyBookInquiryForm
         formUrl={publicEnv.PUBLIC_HONEYBOOK_FORM_URL || undefined}
+        fallbackUrl="https://emilyschrumpfbeaut.wixsite.com/s-bridal-hair"
         fallbackEmail={contactEmail}
         privacyUrl="/privacy/"
       />
@@ -170,7 +171,9 @@ if (siteUrl) {
           <a href={`mailto:${contactEmail}`}>{contactEmail}</a>.
         </p>
       ) : (
-        <p>If the embed is unavailable, use the direct HoneyBook link shown beside the form.</p>
+        <p>
+          If the embed is unavailable, use the link to Emily's current inquiry page below the form.
+        </p>
       )}
       <p>
         Only share details needed to discuss the wedding and services. Do not include financial,

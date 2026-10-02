@@ -43,6 +43,7 @@ const availability = settings?.bookingAvailability;
         Soft, lasting styles and a calm, considered experience for weddings across Colorado.
       </p>
       <ButtonLink href="/inquire/">Check your date</ButtonLink>
+      <p class="hero-note hero-note--mobile">Dreamy. Romantic. Effortless. Long-lasting.</p>
     </div>
     <p class="hero-note">Dreamy. Romantic. Effortless. Long-lasting.</p>
   </section>
@@ -261,8 +262,9 @@ const availability = settings?.bookingAvailability;
 
   .hero-shade {
     background:
-      linear-gradient(180deg, rgb(46 31 24 / 0.44) 0%, transparent 32%),
-      linear-gradient(0deg, rgb(46 31 24 / 0.72) 0%, rgb(46 31 24 / 0.08) 64%);
+      linear-gradient(90deg, rgb(46 31 24 / 0.43), rgb(46 31 24 / 0.22) 45%, transparent 70%),
+      linear-gradient(180deg, rgb(46 31 24 / 0.5) 0%, transparent 32%),
+      linear-gradient(0deg, rgb(46 31 24 / 0.85) 0%, rgb(46 31 24 / 0.2) 64%);
   }
 
   .hero-content {
@@ -301,6 +303,26 @@ const availability = settings?.bookingAvailability;
     font-size: 0.72rem;
     letter-spacing: 0.12em;
     text-transform: uppercase;
+  }
+
+  .hero-note--mobile {
+    display: none;
+  }
+
+  @media (max-width: 47.999rem) {
+    .hero-note {
+      display: none;
+    }
+
+    .hero-note--mobile {
+      position: static;
+      display: block;
+      max-width: 30ch;
+      margin: var(--space-4) 0 0;
+      font-size: 0.68rem;
+      line-height: 1.5;
+      text-wrap: balance;
+    }
   }
 
   .introduction {
