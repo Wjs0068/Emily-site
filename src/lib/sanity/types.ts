@@ -74,6 +74,7 @@ export interface AddonResult {
 export interface TestimonialResult {
   contentStatus: ContentStatus;
   quote: string;
+  excerpt?: string;
   clientName: string;
   venue?: string;
   location?: string;
@@ -89,6 +90,10 @@ export interface GalleryItemResult {
   caption?: string;
   styleCategory: string;
   venue?: string;
+  brideName?: string;
+  weddingDate?: string;
+  season?: string;
+  year?: number;
   location?: string;
   photographerName?: string;
   photographerUrl?: string;

@@ -14,11 +14,12 @@ export const sanityQueries = {
     contentStatus, name, description, pricingType, price, currency, displayQualifier
   }`,
   testimonials: `*[_type == "testimonial" && publicationPermission == true && contentStatus == "OWNER_APPROVED"] | order(sortOrder asc){
-    contentStatus, quote, clientName, venue, location, "source": sourceLabel, sourceUrl,
+    contentStatus, quote, excerpt, clientName, venue, location, "source": sourceLabel, sourceUrl,
     publicationPermission, featured
   }`,
   galleryItems: `*[_type == "galleryItem" && contentStatus == "OWNER_APPROVED" && publicationPermission == true] | order(sortOrder asc){
-    contentStatus, caption, styleCategory, venue, location, photographerName, photographerUrl,
+    contentStatus, caption, styleCategory, venue, location, brideName, weddingDate, season, year,
+    photographerName, photographerUrl,
     publicationPermission,
     "image": {"url": image.asset->url, "alt": image.alt, "width": image.asset->metadata.dimensions.width, "height": image.asset->metadata.dimensions.height}
   }`,

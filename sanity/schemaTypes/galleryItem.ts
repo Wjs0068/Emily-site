@@ -45,6 +45,18 @@ export default defineType({
       validation: (Rule) => Rule.required(),
     }),
     defineField({ name: 'venue', title: 'Venue', type: 'string' }),
+    defineField({
+      name: 'brideName',
+      title: 'Bride name',
+      type: 'string',
+      description: 'Enter only an owner-confirmed identity with permission to publish the name.',
+    }),
+    defineField({
+      name: 'weddingDate',
+      title: 'Wedding date',
+      type: 'date',
+      description: 'Leave blank until Emily confirms the actual wedding date.',
+    }),
     defineField({ name: 'location', title: 'Location', type: 'string' }),
     defineField({ name: 'season', title: 'Season', type: 'string' }),
     defineField({

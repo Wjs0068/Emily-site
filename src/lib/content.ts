@@ -153,7 +153,9 @@ export const testimonials = [
     featured: true,
   },
   {
-    quote: 'Understood what a Texan bride wants for her hair.',
+    quote:
+      'I just knew that hiring someone as talented as you was the safest bet, and you beyond proved my gut feeling right! I feel the luckiest to have booked you when I did last year, because your talent is second to none. Emily has such a gift, and truly to the core understood what a Texan bride wants for her hair!',
+    excerpt: 'Understood what a Texan bride wants for her hair.',
     clientName: 'Lauren',
     featured: true,
   },
@@ -475,7 +477,7 @@ export const journalPosts: JournalPost[] = [
       {
         type: 'image',
         image: 'detail',
-        alt: 'Close view of a textured bridal updo in progress',
+        alt: 'Bride wearing long half-up curls beside her partner outdoors',
         caption: 'Development image placement using approved migrated photography.',
       },
       { type: 'heading', level: 3, text: 'Leave room for transitions' },

@@ -2,9 +2,9 @@
 import stylingWaves from '@/assets/source/01-branding-3399.jpg';
 import stylingPortrait from '@/assets/source/02-branding-3944.jpg';
 import weddingParty from '@/assets/source/03-img-1190.jpg';
-import texturedUpdo from '@/assets/source/04-bride-015a0371.jpg';
+import romanticHalfUp from '@/assets/source/04-bride-015a0371.jpg';
 import softWaves from '@/assets/source/05-lauren.jpeg';
-import mountainBride from '@/assets/source/08-caley-wedding.jpg';
+import mountainBride from '@/assets/derived/08-caley-wedding-cropped.jpg';
 import restyle from '@/assets/source/11-branding-3632.jpg';
 import guestStyling from '@/assets/source/12-branding-4201.jpg';
 import Breadcrumbs from '@/components/content/Breadcrumbs.astro';
@@ -35,15 +35,14 @@ const fallbackGalleryItems = [
     context: 'Styling in progress',
   },
   {
-    image: texturedUpdo,
-    alt: 'Textured bridal updo with loose face-framing pieces',
-    styleCategory: 'Textured updo',
+    image: romanticHalfUp,
+    alt: 'Bride wearing long half-up curls beside her partner outdoors',
+    styleCategory: 'Romantic half-up',
   },
   {
     image: weddingParty,
-    alt: 'Bride and wedding party gathered outdoors in the Colorado mountains',
+    alt: 'Bride and wedding party gathered outdoors in the mountains',
     styleCategory: 'Bridal party',
-    location: 'Colorado',
   },
   {
     image: softWaves,
@@ -52,14 +51,13 @@ const fallbackGalleryItems = [
   },
   {
     image: stylingPortrait,
-    alt: 'Emily shaping polished waves with a curling iron',
+    alt: "Emily applying finishing spray to a client's textured updo",
     styleCategory: 'Styling in progress',
   },
   {
     image: mountainBride,
     alt: 'Bride wearing a loose updo and holding a bouquet outdoors',
     styleCategory: 'Loose updo',
-    location: 'Colorado',
   },
   {
     image: restyle,
@@ -68,7 +66,7 @@ const fallbackGalleryItems = [
   },
   {
     image: guestStyling,
-    alt: 'Emily smiling while styling a client in her chair',
+    alt: 'Emily and a client reflected in a studio mirror after styling',
     styleCategory: 'Wedding morning',
   },
 ];
@@ -90,6 +88,7 @@ const galleryItems =
     : fallbackGalleryItems.map((item) => ({
         ...item,
         venue: undefined,
+        location: undefined,
         photographerName: undefined,
         photographerUrl: undefined,
       }));

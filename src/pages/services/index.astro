@@ -7,14 +7,19 @@ import ButtonLink from '@/components/global/ButtonLink.astro';
 import ResponsiveImage from '@/components/content/ResponsiveImage.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import { processSteps } from '@/lib/content';
-import { getAddons, getPackages } from '@/lib/sanity/content';
+import { getAddons, getPackages, getTestimonials } from '@/lib/sanity/content';
 import { breadcrumbSchema, serviceSchema } from '@/lib/seo/schema';
 
 const title = "Bridal Hair Packages in Colorado | Em's Bridal Hair";
 const description =
   'Compare bridal hairstyling packages, thoughtful add-ons, and the planning experience for Denver and Colorado weddings.';
 const siteUrl = import.meta.env.PUBLIC_SITE_URL || undefined;
-const [packages, addons] = await Promise.all([getPackages(), getAddons()]);
+const [packages, addons, testimonials] = await Promise.all([
+  getPackages(),
+  getAddons(),
+  getTestimonials(),
+]);
+const laurenTestimonial = testimonials.find((item) => item.clientName === 'Lauren');
 const schemas = [serviceSchema(siteUrl)];
 
 if (siteUrl) {
@@ -29,7 +34,7 @@ if (siteUrl) {
 const addonImages = [restyleImage, guestImage, extensionsImage];
 const addonAlts = [
   'Emily refining a client hairstyle in her studio',
-  'Emily smiling while working with a client',
+  'Emily and a client reflected in a studio mirror after styling',
   'Emily comparing two shades of clip-in hair extensions',
 ];
 ---
@@ -38,7 +43,7 @@ const addonAlts = [
   <section class="service-hero">
     <ResponsiveImage
       src={heroImage}
-      alt="Emily shaping long waves during a bridal styling session"
+      alt="Emily applying finishing spray to a client's textured updo"
       widths={[640, 960, 1440, 1920]}
       sizes="100vw"
       loading="eager"
@@ -140,6 +145,12 @@ const addonAlts = [
       <div class="included-heading">
         <p class="eyebrow">What is built in</p>
         <h2 id="included-heading">The support behind the style.</h2>
+        {laurenTestimonial && (
+          <figure data-content-status={laurenTestimonial.contentStatus}>
+            <blockquote>“{laurenTestimonial.quote}”</blockquote>
+            <figcaption>— {laurenTestimonial.clientName}</figcaption>
+          </figure>
+        )}
       </div>
       <div class="included-list">
         <article>
@@ -471,6 +482,19 @@ const addonAlts = [
   .included-list article {
     padding-block: var(--space-4);
     border-top: 1px solid color-mix(in srgb, var(--color-surface) 45%, transparent);
+  }
+
+  .included-heading figure {
+    margin: var(--space-5) 0 0;
+  }
+
+  .included-heading blockquote {
+    margin: 0 0 var(--space-3);
+    font-size: var(--step-0);
+  }
+
+  .included-heading figcaption {
+    font-size: var(--step--1);
   }
 
   .included-list h3 {

@@ -1,6 +1,6 @@
 # Content Migration Plan
 
-Status: inventory and migration plan only. No Wix assets have been copied and no Sanity dataset has been created.
+Status: the Astro implementation and all 16 Wix source assets are present. The final October 2, 2026 content/asset reconciliation is in `FINAL-MIGRATION-AUDIT.md`; remaining approvals are in `OWNER-DECISIONS.md`. A production Sanity dataset is not configured locally. The proposed workflows below are historical planning context, not approval to restore disputed policies or change the locked design.
 
 ## Migration principles
 
@@ -14,23 +14,23 @@ Status: inventory and migration plan only. No Wix assets have been copied and no
 
 ## Content disposition matrix
 
-| Existing content                           | New destination            | Sanity type                                  | Action                                                                      |
-| ------------------------------------------ | -------------------------- | -------------------------------------------- | --------------------------------------------------------------------------- |
-| Hero promise and Denver location           | Home                       | `siteSettings` plus source-controlled layout | Rewrite H1 for service/location; retain romantic supporting language        |
-| 300+ weddings / 9 years / 3 educator years | Home/About                 | `siteSettings.experienceStats`               | Verify and add review reminder because values age                           |
-| Three bridal packages                      | Services and home preview  | `package`                                    | Reconcile prices/capacity; copyedit; complete dangling bullets              |
-| Three add-ons                              | Services                   | `addon`                                      | Clarify terms and constraints                                               |
-| Kailey, Lauren, Caley quotes               | Home/Services              | `testimonial`                                | Correct only with client approval; add source/context and permission record |
-| “What it's like working with me” claims    | Home/Services              | Source copy or `siteSettings`                | Consolidate into process/value section                                      |
-| Biography and personal details             | About                      | Source copy or a focused settings field      | Copyedit while preserving voice; verify credentials                         |
-| “Who this is for/not for”                  | Services                   | Source copy                                  | Reframe positively and remove dismissive language                           |
-| Booking availability                       | Global/Home/Inquire        | `siteSettings.bookingAvailability`           | Migrate only after revalidation                                             |
-| 15 FAQ entries                             | FAQ                        | `faq`                                        | Merge duplicate minimum questions; resolve contradictions; categorize       |
-| HoneyBook form prompts                     | Inquire                    | Source-controlled field definitions          | Rebuild natively; preserve useful qualification intent                      |
-| Generic inquiry-services page              | None                       | None                                         | Do not migrate; real package content is stronger                            |
-| Empty event/booking/pricing pages          | None                       | None                                         | Remove/redirect per architecture                                            |
-| Wix legal/accessibility templates          | New approved utility pages | None or source content                       | Do not migrate; replace with accurate reviewed documents                    |
-| Footer social icons/URLs                   | Footer                     | `siteSettings.socialLinks`                   | Replace only with verified owner profiles                                   |
+| Existing content                           | New destination            | Sanity type                                  | Action                                                                        |
+| ------------------------------------------ | -------------------------- | -------------------------------------------- | ----------------------------------------------------------------------------- |
+| Hero promise and Denver location           | Home                       | `siteSettings` plus source-controlled layout | Rewrite H1 for service/location; retain romantic supporting language          |
+| 300+ weddings / 9 years / 3 educator years | Home/About                 | `siteSettings.experienceStats`               | Verify and add review reminder because values age                             |
+| Three bridal packages                      | Services and home preview  | `package`                                    | Reconcile prices/capacity; copyedit; complete dangling bullets                |
+| Three add-ons                              | Services                   | `addon`                                      | Clarify terms and constraints                                                 |
+| Kailey, Lauren, Caley quotes               | Home/Services              | `testimonial`                                | Correct only with client approval; add source/context and permission record   |
+| “What it's like working with me” claims    | Home/Services              | Source copy or `siteSettings`                | Consolidate into process/value section                                        |
+| Biography and personal details             | About                      | Source copy or a focused settings field      | Copyedit while preserving voice; verify credentials                           |
+| “Who this is for/not for”                  | Services                   | Source copy                                  | Reframe positively and remove dismissive language                             |
+| Booking availability                       | Global/Home/Inquire        | `siteSettings.bookingAvailability`           | Migrate only after revalidation                                               |
+| 15 FAQ entries                             | FAQ                        | `faq`                                        | Merge duplicate minimum questions; resolve contradictions; categorize         |
+| HoneyBook form                             | Inquire                    | Isolated public-loader integration           | Preserve the published HoneyBook placement; do not rebuild or submit the form |
+| Generic inquiry-services page              | None                       | None                                         | Do not migrate; real package content is stronger                              |
+| Empty event/booking/pricing pages          | None                       | None                                         | Remove/redirect per architecture                                              |
+| Wix legal/accessibility templates          | New approved utility pages | None or source content                       | Do not migrate; replace with accurate reviewed documents                      |
+| Footer social icons/URLs                   | Footer                     | `siteSettings.socialLinks`                   | Replace only with verified owner profiles                                     |
 
 ## Image inventory
 

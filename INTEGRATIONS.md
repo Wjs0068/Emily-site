@@ -26,6 +26,12 @@ The URL is public, not a credential. The form is only loaded on `/inquire/`, wit
 
 The iframe is cross-origin, so this site cannot change its internal labels, focus behavior, validation, error states, or detect a successful submission. Axe found serious or critical issues inside HoneyBook's own frame: invalid `autocomplete="nope"`, low-contrast helper text, and an unlabeled select input. The site-level axe test excludes the provider iframe, while the live-load test verifies its fields. Emily should review the provider form's accessibility in HoneyBook or with HoneyBook support.
 
+## Final preview audit — October 2, 2026
+
+The repository retains the current HoneyBook public placement loader unchanged. The supplied preview at `https://emily-site-preview.wjschrumpf.workers.dev/inquire/` also contains that loader and placement, so an older bare-iframe implementation is not the cause of its missing form. Browser inspection found no `data-form-url`, no mounted iframe or requested placement-loader script, and the visible unavailable message. This indicates missing build-time form configuration. Set the public URL and provider variables above and redeploy the reviewed repository; do not rebuild the inquiry form. No real inquiry was entered or submitted.
+
+The live preview has no Open Graph image and its canonical hostname is `emily-site-preview.workers.dev`, which differs from the supplied preview hostname. The final pass creates `/images/social/emily-bridal-hair-og.jpg` and wires it as the layout default, but local `PUBLIC_SITE_URL` is unset. Absolute image/canonical metadata is intentionally omitted until that variable is configured with a verified domain. Production domain and business/rights approval remain owner decisions.
+
 ## Privacy policy
 
 `/privacy/` is the canonical site privacy page. It defaults to `PRIVACY_POLICY_STATUS=DRAFT`, is marked `noindex,nofollow`, and displays an owner/legal-review notice. A production content build fails unless the status is explicitly changed to `OWNER_APPROVED` after review. The footer and inquiry notice always link to the local route; no Wix privacy-template URL is used.

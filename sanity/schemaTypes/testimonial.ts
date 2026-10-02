@@ -16,6 +16,14 @@ export default defineType({
       validation: (Rule) => Rule.required().max(900),
     }),
     defineField({
+      name: 'excerpt',
+      title: 'Home excerpt',
+      type: 'text',
+      rows: 2,
+      description: 'Optional approved excerpt for Home; keep the complete original in Quote.',
+      validation: (Rule) => Rule.max(240),
+    }),
+    defineField({
       name: 'clientName',
       title: 'Client name',
       type: 'string',
