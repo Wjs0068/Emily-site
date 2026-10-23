@@ -20,8 +20,14 @@ export const sanityQueries = {
   galleryItems: `*[_type == "galleryItem" && contentStatus == "OWNER_APPROVED" && publicationPermission == true] | order(sortOrder asc){
     contentStatus, caption, styleCategory, venue, location, brideName, weddingDate, season, year,
     photographerName, photographerUrl,
-    publicationPermission,
-    "image": {"url": image.asset->url, "alt": image.alt, "width": image.asset->metadata.dimensions.width, "height": image.asset->metadata.dimensions.height}
+    publicationPermission, featured,
+    "image": {"url": image.asset->url, "alt": image.alt, "width": image.asset->metadata.dimensions.width, "height": image.asset->metadata.dimensions.height, "hotspot": image.hotspot}
+  }`,
+  videos: `*[_type == "videoItem" && active == true && contentStatus == "OWNER_APPROVED" && publicationPermission == true && websiteUsageRights == true] | order(sortOrder asc)[0...6]{
+    "id": _id, title, description, contentStatus, publicationPermission, websiteUsageRights,
+    sortOrder, instagramPermalink, hasSpeech, transcript, captionsUrl,
+    "videoUrl": coalesce(videoFile.asset->url, videoUrl),
+    "poster": {"url": poster.asset->url, "alt": poster.alt, "width": poster.asset->metadata.dimensions.width, "height": poster.asset->metadata.dimensions.height, "hotspot": poster.hotspot}
   }`,
   faq: `*[_type == "faq" && active == true && contentStatus == "OWNER_APPROVED"] | order(sortOrder asc){
     contentStatus, question, "answer": pt::text(answer), category, sortOrder, ownerDecisionKey

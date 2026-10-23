@@ -1,0 +1,59 @@
+---
+import VideoShowcase from '@/components/content/VideoShowcase.astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { videoDemo } from '@/lib/development/video-demo';
+import { isProductionContent } from '@/lib/env';
+import { localGallery } from '@/lib/gallery';
+import type { ShowcaseVideo } from '@/lib/videos';
+
+export function getStaticPaths() {
+  return import.meta.env.DEV && !isProductionContent
+    ? [{ params: { preview: 'video-showcase' } }]
+    : [];
+}
+
+const demos: ShowcaseVideo[] = localGallery
+  .filter((item) => typeof item.image !== 'string')
+  .slice(0, 6)
+  .map((item, index) => {
+    const image = item.image;
+    if (typeof image === 'string') throw new Error('The layout preview requires local posters.');
+    return {
+      id: `layout-demo-${index}`,
+      title: `Layout demo ${String(index + 1).padStart(2, '0')}`,
+      description:
+        'Generated silent color sample for testing the player. The cover is a still photograph, not footage of this hairstyle.',
+      poster: { url: image, alt: item.alt, width: image.width, height: image.height },
+      videoUrl: videoDemo,
+      hasSpeech: false,
+      sortOrder: index,
+      contentStatus: 'DEVELOPMENT_SAMPLE',
+      publicationPermission: false,
+      websiteUsageRights: false,
+    };
+  });
+---
+
+<BaseLayout
+  title="Video layout preview | Development only"
+  description="Development-only visual and interaction preview, not published bridal video content."
+  headerTheme="light"
+  robots="noindex,nofollow"
+>
+  <header class="preview-heading">
+    <h1>Video layout preview</h1>
+    <p>Development only. These examples do not appear on Home or in a built site.</p>
+  </header>
+  <VideoShowcase items={demos} developmentPreview />
+</BaseLayout>
+
+<style>
+  .preview-heading {
+    max-width: var(--layout-width);
+    margin: auto;
+    padding: var(--space-5) var(--gutter);
+  }
+  h1 {
+    font-size: var(--step-3);
+  }
+</style>

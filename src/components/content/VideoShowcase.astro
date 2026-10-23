@@ -1,0 +1,357 @@
+---
+import ResponsiveImage from '@/components/content/ResponsiveImage.astro';
+import { isProductionContent } from '@/lib/env';
+import { instagramLink, isPublishableVideo, type ShowcaseVideo } from '@/lib/videos';
+
+interface Props {
+  items: ShowcaseVideo[];
+  developmentPreview?: boolean;
+}
+const { items, developmentPreview = false } = Astro.props;
+const demo = import.meta.env.DEV && !isProductionContent && developmentPreview;
+const visibleItems = (demo ? items : items.filter(isPublishableVideo)).slice(0, 6);
+const playerData = visibleItems.map((item) => ({
+  title: item.title,
+  description: item.description,
+  videoUrl: item.videoUrl,
+  captionsUrl: item.captionsUrl,
+  transcript: item.transcript,
+  instagramPermalink: instagramLink(item.instagramPermalink),
+}));
+---
+
+{visibleItems.length > 0 && (
+  <section
+    class="video-showcase"
+    aria-labelledby="video-title"
+    data-video-showcase
+    data-development-demo={demo ? 'true' : undefined}
+  >
+    <div class="video-inner">
+      <header class="video-heading">
+        <p class="eyebrow">{demo ? 'Development layout demonstration' : 'Bridal hair in motion'}</p>
+        <h2 id="video-title">See the movement.</h2>
+        {demo && (
+          <p role="note">
+            Six still-photo covers with a generated silent test clip. These are layout
+            demonstrations, not Emily's Reels.
+          </p>
+        )}
+      </header>
+      <div class="video-grid">
+        {visibleItems.map((item, index) => (
+          <figure>
+            <button
+              type="button"
+              class="video-poster"
+              data-video-index={index}
+              aria-haspopup="dialog"
+              aria-controls="bridal-video-player"
+              aria-label={`${demo ? 'Preview player' : 'Play'}: ${item.title}`}
+            >
+              <ResponsiveImage
+                src={item.poster.url}
+                alt={item.poster.alt}
+                width={item.poster.width}
+                height={item.poster.height}
+                widths={[240, 360, 480, 660, 768]}
+                sizes="(min-width: 56rem) 28vw, (min-width: 23rem) 43vw, 90vw"
+                position={
+                  item.poster.hotspot
+                    ? `${item.poster.hotspot.x * 100}% ${item.poster.hotspot.y * 100}%`
+                    : undefined
+                }
+              />
+              <span class="play-mark" aria-hidden="true">
+                ▷
+              </span>
+              {demo && <span class="demo-label">Layout demo</span>}
+            </button>
+            <figcaption>{item.title}</figcaption>
+          </figure>
+        ))}
+      </div>
+      <noscript>
+        <p>
+          Video playback requires JavaScript. The bridal photographs and portfolio remain available.
+        </p>
+      </noscript>
+      <dialog
+        id="bridal-video-player"
+        class="video-dialog"
+        aria-labelledby="video-player-title"
+        aria-describedby="video-player-description"
+      >
+        <div class="dialog-top">
+          <h3 id="video-player-title"></h3>
+          <button
+            type="button"
+            class="video-close"
+            data-video-close
+            autofocus
+            aria-label="Close video"
+          >
+            Close <span aria-hidden="true">×</span>
+          </button>
+        </div>
+        <video
+          controls
+          playsinline
+          preload="none"
+          data-video-player
+          aria-label="Bridal hair video"
+          crossorigin="anonymous"
+        ></video>
+        <p id="video-player-description"></p>
+        <p data-video-status role="status" hidden></p>
+        <details data-video-transcript hidden>
+          <summary>Read transcript</summary>
+          <p></p>
+        </details>
+        <a data-video-instagram target="_blank" rel="noreferrer" hidden>
+          View on Instagram
+        </a>
+      </dialog>
+      <script
+        type="application/json"
+        data-video-items
+        set:html={JSON.stringify(playerData).replaceAll('<', '\\u003c')}
+      />
+    </div>
+  </section>
+)}
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-video-showcase]').forEach((section) => {
+    const dialog = section.querySelector<HTMLDialogElement>('dialog');
+    const player = section.querySelector<HTMLVideoElement>('[data-video-player]');
+    const heading = section.querySelector<HTMLElement>('#video-player-title');
+    const description = section.querySelector<HTMLElement>('#video-player-description');
+    const status = section.querySelector<HTMLElement>('[data-video-status]');
+    const transcript = section.querySelector<HTMLDetailsElement>('[data-video-transcript]');
+    const instagram = section.querySelector<HTMLAnchorElement>('[data-video-instagram]');
+    const data = section.querySelector('[data-video-items]');
+    if (
+      !dialog ||
+      !player ||
+      !heading ||
+      !description ||
+      !status ||
+      !transcript ||
+      !instagram ||
+      !data
+    )
+      return;
+    const items: Array<{
+      title: string;
+      description: string;
+      videoUrl?: string;
+      captionsUrl?: string;
+      transcript?: string;
+      instagramPermalink?: string;
+    }> = JSON.parse(data.textContent || '[]');
+    let trigger: HTMLButtonElement | undefined;
+    const reset = () => {
+      player.pause();
+      player.removeAttribute('src');
+      player.replaceChildren();
+      player.load();
+      trigger?.focus({ preventScroll: true });
+    };
+    dialog.addEventListener('close', reset);
+    section.querySelector('[data-video-close]')?.addEventListener('click', () => dialog.close());
+    dialog.addEventListener('click', (event) => {
+      if (event.target === dialog) {
+        const bounds = dialog.getBoundingClientRect();
+        if (
+          event.clientX < bounds.left ||
+          event.clientX > bounds.right ||
+          event.clientY < bounds.top ||
+          event.clientY > bounds.bottom
+        )
+          dialog.close();
+      }
+    });
+    player.addEventListener('error', () => {
+      if (dialog.open) {
+        status.textContent =
+          'This video is temporarily unavailable. You can still explore the portfolio.';
+        status.hidden = false;
+      }
+    });
+    section.querySelectorAll<HTMLButtonElement>('[data-video-index]').forEach((button) => {
+      button.addEventListener('click', () => {
+        const item = items[Number(button.dataset.videoIndex)];
+        if (!item) return;
+        trigger = button;
+        heading.textContent = item.title;
+        description.textContent = item.description;
+        status.hidden = true;
+        transcript.hidden = !item.transcript;
+        transcript.open = false;
+        transcript.querySelector('p')!.textContent = item.transcript || '';
+        instagram.hidden = !item.instagramPermalink;
+        if (item.instagramPermalink) instagram.href = item.instagramPermalink;
+        else instagram.removeAttribute('href');
+        if (item.captionsUrl) {
+          const track = document.createElement('track');
+          track.kind = 'captions';
+          track.label = 'English';
+          track.srclang = 'en';
+          track.src = item.captionsUrl;
+          track.default = true;
+          player.append(track);
+        }
+        dialog.showModal();
+        if (item.videoUrl) {
+          player.src = item.videoUrl;
+          player.load();
+          void player.play().catch(() => {
+            if (!player.error && dialog.open) {
+              status.textContent = 'Use the play control to start the video.';
+              status.hidden = false;
+            }
+          });
+        }
+      });
+    });
+  });
+</script>
+
+<style>
+  .video-showcase {
+    padding: var(--space-6) var(--gutter);
+    background: var(--color-background-soft);
+  }
+  .video-inner {
+    max-width: var(--layout-width);
+    margin-inline: auto;
+  }
+  .video-heading {
+    margin-bottom: var(--space-5);
+    max-width: 45rem;
+  }
+  .video-heading h2 {
+    margin-bottom: var(--space-3);
+    font-size: var(--step-3);
+  }
+  .video-heading [role='note'] {
+    font-size: var(--step--1);
+  }
+  .video-grid {
+    display: grid;
+    gap: var(--space-4) var(--space-3);
+  }
+  figure {
+    min-width: 0;
+    margin: 0;
+  }
+  .video-poster {
+    display: block;
+    position: relative;
+    width: 100%;
+    border: 0;
+    border-radius: 0;
+    padding: 0;
+    background: var(--color-background-alt);
+    cursor: pointer;
+    overflow: hidden;
+  }
+  .video-poster :global(img) {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 9 / 16;
+    object-fit: cover;
+  }
+  .play-mark {
+    position: absolute;
+    inset: auto var(--space-3) var(--space-3) auto;
+    display: grid;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    font-size: 2rem;
+    line-height: 1;
+    background: var(--color-surface);
+    color: var(--color-text);
+  }
+  .demo-label {
+    position: absolute;
+    left: var(--space-2);
+    top: var(--space-2);
+    padding: var(--space-1) var(--space-2);
+    background: var(--color-surface);
+    color: var(--color-text);
+    font-size: 0.75rem;
+  }
+  figcaption {
+    padding-top: var(--space-2);
+    font-size: var(--step--1);
+  }
+  .video-dialog {
+    width: min(34rem, calc(100% - 2rem));
+    max-height: calc(100dvh - 2rem);
+    overflow-y: auto;
+    border: 0;
+    padding: var(--space-4);
+    background: var(--color-background);
+    color: var(--color-text);
+  }
+  .video-dialog::backdrop {
+    background: rgb(46 31 24 / 0.8);
+  }
+  .dialog-top {
+    display: flex;
+    align-items: start;
+    gap: var(--space-3);
+    justify-content: space-between;
+    margin-bottom: var(--space-3);
+  }
+  .dialog-top h3 {
+    margin: 0;
+    align-self: center;
+    font-size: var(--step-1);
+  }
+  .video-close {
+    flex: 0 0 auto;
+    min-height: 2.75rem;
+    padding: var(--space-2);
+    border: 1px solid var(--color-text);
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+  }
+  .video-dialog video {
+    display: block;
+    width: 100%;
+    max-height: 65dvh;
+    aspect-ratio: 9 / 16;
+    background: var(--color-text);
+  }
+  .video-dialog p {
+    margin: var(--space-3) 0;
+    font-size: var(--step--1);
+  }
+  [data-video-transcript] p {
+    white-space: pre-line;
+  }
+  .video-dialog a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+  }
+  .video-dialog a[hidden] {
+    display: none;
+  }
+  @media (min-width: 23rem) {
+    .video-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (min-width: 56rem) {
+    .video-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: var(--space-5) var(--space-4);
+    }
+  }
+</style>

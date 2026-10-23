@@ -12,6 +12,7 @@ interface Props {
   loading?: 'eager' | 'lazy';
   fetchpriority?: 'high' | 'low' | 'auto';
   class?: string;
+  position?: string;
 }
 
 const {
@@ -24,12 +25,37 @@ const {
   loading = 'lazy',
   fetchpriority = 'auto',
   class: className,
+  position,
 } = Astro.props;
+
+const naturalWidth = typeof src === 'string' ? width : src.width;
+const candidates = [
+  ...new Set([
+    ...widths.filter((value) => !naturalWidth || value <= naturalWidth),
+    ...(naturalWidth && naturalWidth < Math.max(...widths) ? [naturalWidth] : []),
+  ]),
+].sort((a, b) => a - b);
+const sanitySource =
+  typeof src === 'string' && new URL(src, 'https://local.invalid').hostname === 'cdn.sanity.io';
+const remoteUrl = (candidate: number) => {
+  const url = new URL(src as string);
+  url.searchParams.set('w', String(candidate));
+  url.searchParams.set('auto', 'format');
+  url.searchParams.set('fit', 'max');
+  url.searchParams.set('q', '85');
+  return url.toString();
+};
 ---
 
 {typeof src === 'string' ? (
   <img
     src={src}
+    srcset={
+      sanitySource
+        ? candidates.map((candidate) => `${remoteUrl(candidate)} ${candidate}w`).join(', ')
+        : undefined
+    }
+    sizes={sanitySource ? sizes : undefined}
     alt={alt}
     width={width}
     height={height}
@@ -37,16 +63,18 @@ const {
     fetchpriority={fetchpriority}
     decoding="async"
     class={className}
+    style={position ? { objectPosition: position } : undefined}
   />
 ) : (
   <Image
     src={src}
     alt={alt}
-    widths={widths}
+    widths={candidates}
     sizes={sizes}
     loading={loading}
     fetchpriority={fetchpriority}
     quality={85}
     class={className}
+    style={position ? { objectPosition: position } : undefined}
   />
 )}

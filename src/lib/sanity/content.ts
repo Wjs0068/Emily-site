@@ -10,6 +10,7 @@ import {
   testimonials as fallbackTestimonials,
 } from '@/lib/content';
 import { isProductionContent, publicEnv } from '@/lib/env';
+import { isPublishableVideo } from '@/lib/videos';
 
 import { sanityQueries } from './queries';
 import type {
@@ -20,6 +21,7 @@ import type {
   PackageResult,
   SiteSettingsResult,
   TestimonialResult,
+  VideoItemResult,
 } from './types';
 
 const client = publicEnv.PUBLIC_SANITY_PROJECT_ID
@@ -184,6 +186,14 @@ export async function getGalleryItems(): Promise<GalleryItemResult[]> {
   if (isProductionContent) return fetchRequired('gallery items', sanityQueries.galleryItems);
   if (client) return client.fetch<GalleryItemResult[]>(sanityQueries.galleryItems);
   return [];
+}
+
+// Optional content: an empty video collection hides the showcase rather than
+// blocking a release or substituting a sample/unauthorized Instagram download.
+export async function getVideoItems(): Promise<VideoItemResult[]> {
+  if (!client) return [];
+  const items = await client.fetch<VideoItemResult[]>(sanityQueries.videos);
+  return items.filter(isPublishableVideo).slice(0, 6);
 }
 
 export async function getFaqs(): Promise<FaqResult[]> {

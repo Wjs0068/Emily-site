@@ -5,6 +5,7 @@ export interface SanityImageResult {
   alt: string;
   width: number;
   height: number;
+  hotspot?: { x: number; y: number };
 }
 
 export interface SiteSettingsResult {
@@ -98,6 +99,23 @@ export interface GalleryItemResult {
   photographerName?: string;
   photographerUrl?: string;
   publicationPermission: boolean;
+  featured?: boolean;
+}
+
+export interface VideoItemResult {
+  id: string;
+  title: string;
+  description: string;
+  poster: SanityImageResult;
+  videoUrl?: string;
+  instagramPermalink?: string;
+  captionsUrl?: string;
+  transcript?: string;
+  hasSpeech: boolean;
+  contentStatus: ContentStatus;
+  publicationPermission: boolean;
+  websiteUsageRights: boolean;
+  sortOrder: number;
 }
 
 export interface FaqResult {

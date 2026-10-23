@@ -6,4 +6,6 @@ package-lock.json
 playwright-report
 studio-dist
 test-results
+output/
+.playwright-cli/
 public/images/source

@@ -5,6 +5,7 @@ import galleryItem from './galleryItem';
 import packageType from './package';
 import siteSettings from './siteSettings';
 import testimonial from './testimonial';
+import videoItem from './videoItem';
 
 export const schemaTypes = [
   siteSettings,
@@ -14,4 +15,5 @@ export const schemaTypes = [
   galleryItem,
   faq,
   blogPost,
+  videoItem,
 ];

@@ -1,7 +1,7 @@
 ---
 import Footer from '@/components/global/Footer.astro';
 import Header from '@/components/global/Header.astro';
-import { publicEnv } from '@/lib/env';
+import { isProductionContent, publicEnv } from '@/lib/env';
 import type { JsonLd } from '@/lib/seo/schema';
 import '@/styles/global.css';
 
@@ -25,6 +25,12 @@ const {
   robots,
 } = Astro.props;
 const siteUrl = publicEnv.PUBLIC_SITE_URL || undefined;
+const siteHostname = siteUrl ? new URL(siteUrl).hostname : '';
+const isTemporaryPreview =
+  !isProductionContent ||
+  siteHostname.endsWith('.workers.dev') ||
+  siteHostname.endsWith('.pages.dev');
+const effectiveRobots = isTemporaryPreview ? 'noindex,nofollow' : robots;
 const canonical = siteUrl ? new URL(Astro.url.pathname, siteUrl).toString() : undefined;
 const absoluteSocialImage =
   socialImage && siteUrl ? new URL(socialImage, siteUrl).toString() : undefined;
@@ -39,7 +45,7 @@ const schemas = schema ? (Array.isArray(schema) ? schema : [schema]) : [];
     <meta name="generator" content={Astro.generator} />
     <meta name="theme-color" content="#5c4033" />
     <meta name="description" content={description} />
-    {robots && <meta name="robots" content={robots} />}
+    {effectiveRobots && <meta name="robots" content={effectiveRobots} />}
     <title>{title}</title>
     {canonical && <link rel="canonical" href={canonical} />}
     <meta property="og:type" content={ogType} />

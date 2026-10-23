@@ -42,6 +42,10 @@ for (const route of routes) {
       const main = page.locator('main');
       await expect(main.getByRole('heading', { level: 1 })).toHaveCount(1);
       await expect(main).toHaveCount(1);
+      await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
+        'content',
+        'noindex,nofollow',
+      );
       await expect(page.getByRole('banner')).toHaveCount(1);
       await expect(page.getByRole('contentinfo')).toHaveCount(1);
       await expect(page.locator('img[width][height]')).toHaveCount(
@@ -195,9 +199,19 @@ test('published HoneyBook form loads on inquire when configured', async ({ page 
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/inquire/', { waitUntil: 'domcontentloaded' });
   const iframe = page.locator('iframe[title="Wedding hair inquiry form"]');
-  await expect(iframe).toHaveAttribute('src', process.env.PUBLIC_HONEYBOOK_FORM_URL!, {
-    timeout: 60_000,
-  });
+  // The provider resolves a changing frame URL; verify the stable form identity.
+  await expect(page.locator('[data-inquiry-provider]')).toHaveAttribute(
+    'data-form-url',
+    process.env.PUBLIC_HONEYBOOK_FORM_URL!,
+  );
+  await expect(iframe).toHaveAttribute(
+    'src',
+    /https:\/\/public\.honeybook\.com\/public_contact_form_app\//,
+    {
+      timeout: 60_000,
+    },
+  );
+  await expect(iframe).toHaveAttribute('name', '69686ba711cbe2002a8d7598');
   const formFrame = page.frameLocator('iframe[title="Wedding hair inquiry form"]');
   await expect(formFrame.getByText('Full name', { exact: false })).toBeVisible({ timeout: 60_000 });
   await expect(formFrame.getByText('Wedding date', { exact: false })).toBeVisible();
